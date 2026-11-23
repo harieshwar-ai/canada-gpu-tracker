@@ -1,0 +1,297 @@
+---
+interface Props {
+  title: string;
+  description: string;
+  ogType?: "website" | "article";
+}
+
+const { title, description, ogType = "website" } = Astro.props;
+const fullTitle = title.includes("Canada GPU Tracker")
+  ? title
+  : `${title} | Canada GPU Tracker`;
+const siteUrl = Astro.site ?? new URL(Astro.url.origin);
+const canonical = new URL(Astro.url.pathname, siteUrl);
+const ogImage = new URL("/og-image.png", siteUrl);
+const contactEmail = "harieshwar.dev@gmail.com";
+---
+
+<!doctype html>
+<html lang="en-CA">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <meta name="generator" content={Astro.generator} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="canonical" href={canonical} />
+
+    <title>{fullTitle}</title>
+
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content={ogType} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:site_name" content="Canada GPU Tracker" />
+    <meta property="og:locale" content="en_CA" />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={fullTitle} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
+
+    <meta name="theme-color" content="#0b0f14" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#f4f7fb" media="(prefers-color-scheme: light)" />
+  </head>
+  <body>
+    <header class="site-header">
+      <a href="/" class="logo">
+        <span class="logo-flag" aria-hidden="true">🇨🇦</span>
+        Canada GPU Tracker
+      </a>
+      <p class="tagline">NVIDIA prices in CAD across Canadian retailers</p>
+    </header>
+    <slot />
+    <footer class="site-footer">
+      <p>
+        Placeholder build — no live retailer data yet.
+        <a href={`mailto:${contactEmail}`}>Contact</a>
+      </p>
+    </footer>
+  </body>
+</html>
+
+<style is:global>
+  :root {
+    color-scheme: light dark;
+    --bg: #f4f7fb;
+    --surface: #ffffff;
+    --border: #d8e0ea;
+    --text: #0f1720;
+    --muted: #5a6a7d;
+    --accent: #76b900;
+    --accent-dim: #5f9400;
+    --warn-bg: #fff4d6;
+    --warn-border: #e6c200;
+    --warn-text: #5c4a00;
+    --in-stock: #0d8f4b;
+    --out-stock: #b44d4d;
+    --shadow: 0 1px 3px rgba(15, 23, 32, 0.08);
+    font-family:
+      "Segoe UI",
+      system-ui,
+      -apple-system,
+      sans-serif;
+    line-height: 1.5;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0b0f14;
+      --surface: #141b24;
+      --border: #2a3544;
+      --text: #e8eef5;
+      --muted: #9aa8ba;
+      --warn-bg: #2a2410;
+      --warn-border: #6b5a12;
+      --warn-text: #f0e2a8;
+      --shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
+    }
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background: var(--bg);
+    color: var(--text);
+  }
+
+  a {
+    color: var(--accent-dim);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    a {
+      color: #9ee650;
+    }
+  }
+
+  .site-header {
+    padding: 1.25rem 1rem 0.5rem;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .logo {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 700;
+    font-size: 1.25rem;
+    color: var(--text);
+    text-decoration: none;
+  }
+
+  .logo-flag {
+    font-size: 1.35rem;
+  }
+
+  .tagline {
+    margin: 0.35rem 0 0;
+    color: var(--muted);
+    font-size: 0.95rem;
+  }
+
+  .site-footer {
+    margin-top: 3rem;
+    padding: 1.5rem 1rem 2.5rem;
+    text-align: center;
+    color: var(--muted);
+    font-size: 0.875rem;
+    border-top: 1px solid var(--border);
+  }
+
+  .site-footer a {
+    margin-left: 0.35rem;
+  }
+
+  .main {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 1rem 2rem;
+  }
+
+  .banner-placeholder {
+    background: var(--warn-bg);
+    border: 1px solid var(--warn-border);
+    color: var(--warn-text);
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    margin: 1rem auto;
+    max-width: 1100px;
+    font-size: 0.9rem;
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+    padding: 1rem;
+  }
+
+  .filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem 1.25rem;
+    align-items: center;
+    margin-bottom: 1rem;
+    font-size: 0.95rem;
+  }
+
+  .filters label {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    cursor: pointer;
+  }
+
+  .filters select {
+    padding: 0.35rem 0.5rem;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text);
+  }
+
+  .table-wrap {
+    overflow-x: auto;
+  }
+
+  table.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.95rem;
+  }
+
+  table.data-table th,
+  table.data-table td {
+    padding: 0.65rem 0.75rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+
+  table.data-table th {
+    color: var(--muted);
+    font-weight: 600;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+
+  table.data-table tbody tr:hover {
+    background: color-mix(in srgb, var(--accent) 8%, transparent);
+  }
+
+  .badge {
+    display: inline-block;
+    padding: 0.15rem 0.5rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+
+  .badge-in {
+    background: color-mix(in srgb, var(--in-stock) 20%, transparent);
+    color: var(--in-stock);
+  }
+
+  .badge-out {
+    background: color-mix(in srgb, var(--out-stock) 18%, transparent);
+    color: var(--out-stock);
+  }
+
+  .gpu-hero {
+    margin-bottom: 1.25rem;
+  }
+
+  .gpu-hero h1 {
+    margin: 0 0 0.35rem;
+    font-size: clamp(1.5rem, 4vw, 2rem);
+  }
+
+  .meta-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.25rem;
+    color: var(--muted);
+    font-size: 0.9rem;
+  }
+
+  .stock-yes {
+    color: var(--in-stock);
+    font-weight: 600;
+  }
+
+  .stock-no {
+    color: var(--out-stock);
+    font-weight: 600;
+  }
+
+  .section-title {
+    margin: 1.5rem 0 0.75rem;
+    font-size: 1.1rem;
+  }
+
+  .back-link {
+    display: inline-block;
+    margin-bottom: 0.75rem;
+    font-size: 0.9rem;
+  }
+</style>

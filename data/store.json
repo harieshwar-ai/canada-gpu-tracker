@@ -1,0 +1,327 @@
+{
+  "version": 1,
+  "placeholder": true,
+  "generatedAt": "2026-11-23T09:56:50.477Z",
+  "gpus": [
+    {
+      "id": "gpu-rtx-5090",
+      "slug": "rtx-5090",
+      "modelName": "GeForce RTX 5090",
+      "series": "50-series",
+      "chip": "Blackwell GB202",
+      "vramGb": 32,
+      "msrpCad": 2899.99,
+      "createdAt": "2026-01-01T00:00:00.000Z",
+      "updatedAt": "2026-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "gpu-rtx-5080",
+      "slug": "rtx-5080",
+      "modelName": "GeForce RTX 5080",
+      "series": "50-series",
+      "chip": "Blackwell GB203",
+      "vramGb": 16,
+      "msrpCad": 1599.99,
+      "createdAt": "2026-01-01T00:00:00.000Z",
+      "updatedAt": "2026-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "gpu-rtx-5070-ti",
+      "slug": "rtx-5070-ti",
+      "modelName": "GeForce RTX 5070 Ti",
+      "series": "50-series",
+      "chip": "Blackwell GB203",
+      "vramGb": 16,
+      "msrpCad": 1099.99,
+      "createdAt": "2026-01-01T00:00:00.000Z",
+      "updatedAt": "2026-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "gpu-rtx-5070",
+      "slug": "rtx-5070",
+      "modelName": "GeForce RTX 5070",
+      "series": "50-series",
+      "chip": "Blackwell GB205",
+      "vramGb": 12,
+      "msrpCad": 799.99,
+      "createdAt": "2026-01-01T00:00:00.000Z",
+      "updatedAt": "2026-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "gpu-rtx-5060-ti",
+      "slug": "rtx-5060-ti",
+      "modelName": "GeForce RTX 5060 Ti",
+      "series": "50-series",
+      "chip": "Blackwell GB206",
+      "vramGb": 8,
+      "msrpCad": 549.99,
+      "createdAt": "2026-01-01T00:00:00.000Z",
+      "updatedAt": "2026-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "gpu-rtx-4060",
+      "slug": "rtx-4060",
+      "modelName": "GeForce RTX 4060",
+      "series": "40-series",
+      "chip": "Ada AD107",
+      "vramGb": 8,
+      "msrpCad": 399.99,
+      "createdAt": "2026-01-01T00:00:00.000Z",
+      "updatedAt": "2026-01-01T00:00:00.000Z"
+    }
+  ],
+  "retailers": [
+    {
+      "id": "ret-best-buy-ca",
+      "slug": "best-buy-ca",
+      "name": "Best Buy Canada",
+      "websiteUrl": "https://www.bestbuy.ca",
+      "countryCode": "CA",
+      "createdAt": "2026-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "ret-canada-computers",
+      "slug": "canada-computers",
+      "name": "Canada Computers",
+      "websiteUrl": "https://www.canadacomputers.com",
+      "countryCode": "CA",
+      "createdAt": "2026-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "ret-memory-express",
+      "slug": "memory-express",
+      "name": "Memory Express",
+      "websiteUrl": "https://www.memoryexpress.com",
+      "countryCode": "CA",
+      "createdAt": "2026-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "ret-newegg-ca",
+      "slug": "newegg-ca",
+      "name": "Newegg.ca",
+      "websiteUrl": "https://www.newegg.ca",
+      "countryCode": "CA",
+      "createdAt": "2026-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "ret-amazon-ca",
+      "slug": "amazon-ca",
+      "name": "Amazon.ca",
+      "websiteUrl": "https://www.amazon.ca",
+      "countryCode": "CA",
+      "createdAt": "2026-01-01T00:00:00.000Z"
+    }
+  ],
+  "listings": [
+    {
+      "id": "listing-best-buy-ca-example-bb-5090",
+      "gpuId": "gpu-rtx-5090",
+      "retailerId": "ret-best-buy-ca",
+      "sku": "EXAMPLE-BB-5090",
+      "productUrl": "https://example.invalid/bestbuy/rtx-5090",
+      "brand": "NVIDIA",
+      "variantLabel": "Founders Edition",
+      "createdAt": "2026-11-20T18:00:00.000Z",
+      "updatedAt": "2026-11-20T18:00:00.000Z"
+    },
+    {
+      "id": "listing-memory-express-example-me-5090",
+      "gpuId": "gpu-rtx-5090",
+      "retailerId": "ret-memory-express",
+      "sku": "EXAMPLE-ME-5090",
+      "productUrl": "https://example.invalid/memoryexpress/rtx-5090",
+      "brand": "ASUS",
+      "variantLabel": "TUF Gaming",
+      "createdAt": "2026-11-21T12:00:00.000Z",
+      "updatedAt": "2026-11-21T12:00:00.000Z"
+    },
+    {
+      "id": "listing-canada-computers-example-cc-5080",
+      "gpuId": "gpu-rtx-5080",
+      "retailerId": "ret-canada-computers",
+      "sku": "EXAMPLE-CC-5080",
+      "productUrl": "https://example.invalid/cc/rtx-5080",
+      "brand": "MSI",
+      "variantLabel": "Ventus 3X",
+      "createdAt": "2026-11-22T09:00:00.000Z",
+      "updatedAt": "2026-11-22T09:00:00.000Z"
+    },
+    {
+      "id": "listing-newegg-ca-example-ne-5080",
+      "gpuId": "gpu-rtx-5080",
+      "retailerId": "ret-newegg-ca",
+      "sku": "EXAMPLE-NE-5080",
+      "productUrl": "https://example.invalid/newegg/rtx-5080",
+      "brand": "Gigabyte",
+      "variantLabel": "Windforce",
+      "createdAt": "2026-11-22T15:30:00.000Z",
+      "updatedAt": "2026-11-22T15:30:00.000Z"
+    },
+    {
+      "id": "listing-amazon-ca-example-amz-5070ti",
+      "gpuId": "gpu-rtx-5070-ti",
+      "retailerId": "ret-amazon-ca",
+      "sku": "EXAMPLE-AMZ-5070TI",
+      "productUrl": "https://example.invalid/amazon/rtx-5070-ti",
+      "brand": "NVIDIA",
+      "variantLabel": "Founders Edition",
+      "createdAt": "2026-11-23T08:00:00.000Z",
+      "updatedAt": "2026-11-23T08:00:00.000Z"
+    },
+    {
+      "id": "listing-best-buy-ca-example-bb-5070",
+      "gpuId": "gpu-rtx-5070",
+      "retailerId": "ret-best-buy-ca",
+      "sku": "EXAMPLE-BB-5070",
+      "productUrl": "https://example.invalid/bestbuy/rtx-5070",
+      "brand": "ZOTAC",
+      "variantLabel": "Twin Edge",
+      "createdAt": "2026-11-23T07:00:00.000Z",
+      "updatedAt": "2026-11-23T07:00:00.000Z"
+    },
+    {
+      "id": "listing-memory-express-example-me-5070",
+      "gpuId": "gpu-rtx-5070",
+      "retailerId": "ret-memory-express",
+      "sku": "EXAMPLE-ME-5070",
+      "productUrl": "https://example.invalid/memoryexpress/rtx-5070",
+      "brand": "PNY",
+      "variantLabel": "XLR8",
+      "createdAt": "2026-11-22T20:00:00.000Z",
+      "updatedAt": "2026-11-22T20:00:00.000Z"
+    },
+    {
+      "id": "listing-canada-computers-example-cc-5060ti",
+      "gpuId": "gpu-rtx-5060-ti",
+      "retailerId": "ret-canada-computers",
+      "sku": "EXAMPLE-CC-5060TI",
+      "productUrl": "https://example.invalid/cc/rtx-5060-ti",
+      "brand": "Palit",
+      "variantLabel": "Dual",
+      "createdAt": "2026-11-21T16:00:00.000Z",
+      "updatedAt": "2026-11-21T16:00:00.000Z"
+    },
+    {
+      "id": "listing-newegg-ca-example-ne-4060",
+      "gpuId": "gpu-rtx-4060",
+      "retailerId": "ret-newegg-ca",
+      "sku": "EXAMPLE-NE-4060",
+      "productUrl": "https://example.invalid/newegg/rtx-4060",
+      "brand": "EVGA",
+      "variantLabel": "XC Black (legacy SKU)",
+      "createdAt": "2026-11-19T11:00:00.000Z",
+      "updatedAt": "2026-11-19T11:00:00.000Z"
+    },
+    {
+      "id": "listing-amazon-ca-example-amz-4060",
+      "gpuId": "gpu-rtx-4060",
+      "retailerId": "ret-amazon-ca",
+      "sku": "EXAMPLE-AMZ-4060",
+      "productUrl": "https://example.invalid/amazon/rtx-4060",
+      "brand": "ASUS",
+      "variantLabel": "Dual",
+      "createdAt": "2026-11-20T14:00:00.000Z",
+      "updatedAt": "2026-11-20T14:00:00.000Z"
+    }
+  ],
+  "priceObservations": [
+    {
+      "id": "obs-listing-best-buy-ca-example-bb-5090-0",
+      "listingId": "listing-best-buy-ca-example-bb-5090",
+      "priceCad": 3199.99,
+      "inStock": true,
+      "observedAt": "2026-11-20T18:00:00.000Z"
+    },
+    {
+      "id": "obs-listing-memory-express-example-me-5090-1",
+      "listingId": "listing-memory-express-example-me-5090",
+      "priceCad": 3349,
+      "inStock": false,
+      "observedAt": "2026-11-21T12:00:00.000Z"
+    },
+    {
+      "id": "obs-listing-canada-computers-example-cc-5080-2",
+      "listingId": "listing-canada-computers-example-cc-5080",
+      "priceCad": 1699.99,
+      "inStock": true,
+      "observedAt": "2026-11-22T09:00:00.000Z"
+    },
+    {
+      "id": "obs-listing-newegg-ca-example-ne-5080-3",
+      "listingId": "listing-newegg-ca-example-ne-5080",
+      "priceCad": 1649.99,
+      "inStock": true,
+      "observedAt": "2026-11-22T15:30:00.000Z"
+    },
+    {
+      "id": "obs-listing-amazon-ca-example-amz-5070ti-4",
+      "listingId": "listing-amazon-ca-example-amz-5070ti",
+      "priceCad": 1149.99,
+      "inStock": true,
+      "observedAt": "2026-11-23T08:00:00.000Z"
+    },
+    {
+      "id": "obs-listing-best-buy-ca-example-bb-5070-5",
+      "listingId": "listing-best-buy-ca-example-bb-5070",
+      "priceCad": 829.99,
+      "inStock": true,
+      "observedAt": "2026-11-23T07:00:00.000Z"
+    },
+    {
+      "id": "obs-listing-memory-express-example-me-5070-6",
+      "listingId": "listing-memory-express-example-me-5070",
+      "priceCad": 799.99,
+      "inStock": false,
+      "observedAt": "2026-11-22T20:00:00.000Z"
+    },
+    {
+      "id": "obs-listing-canada-computers-example-cc-5060ti-7",
+      "listingId": "listing-canada-computers-example-cc-5060ti",
+      "priceCad": 579.99,
+      "inStock": true,
+      "observedAt": "2026-11-21T16:00:00.000Z"
+    },
+    {
+      "id": "obs-listing-newegg-ca-example-ne-4060-8",
+      "listingId": "listing-newegg-ca-example-ne-4060",
+      "priceCad": 349.99,
+      "inStock": true,
+      "observedAt": "2026-11-19T11:00:00.000Z"
+    },
+    {
+      "id": "obs-listing-amazon-ca-example-amz-4060-9",
+      "listingId": "listing-amazon-ca-example-amz-4060",
+      "priceCad": 369.99,
+      "inStock": true,
+      "observedAt": "2026-11-20T14:00:00.000Z"
+    },
+    {
+      "id": "obs-listing-best-buy-ca-example-bb-5070-10",
+      "listingId": "listing-best-buy-ca-example-bb-5070",
+      "priceCad": 849.99,
+      "inStock": true,
+      "observedAt": "2026-11-10T18:00:00.000Z"
+    },
+    {
+      "id": "obs-listing-best-buy-ca-example-bb-5070-11",
+      "listingId": "listing-best-buy-ca-example-bb-5070",
+      "priceCad": 839.99,
+      "inStock": false,
+      "observedAt": "2026-11-15T18:00:00.000Z"
+    },
+    {
+      "id": "obs-listing-best-buy-ca-example-bb-5090-12",
+      "listingId": "listing-best-buy-ca-example-bb-5090",
+      "priceCad": 3299.99,
+      "inStock": false,
+      "observedAt": "2026-11-01T18:00:00.000Z"
+    },
+    {
+      "id": "obs-listing-best-buy-ca-example-bb-5090-13",
+      "listingId": "listing-best-buy-ca-example-bb-5090",
+      "priceCad": 3199.99,
+      "inStock": true,
+      "observedAt": "2026-11-18T18:00:00.000Z"
+    }
+  ]
+}

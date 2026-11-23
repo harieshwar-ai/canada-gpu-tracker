@@ -1,0 +1,130 @@
+---
+interface Series {
+  listingId: string;
+  label: string;
+  points: { t: string; price: number }[];
+}
+
+interface Props {
+  series: Series[];
+  width?: number;
+  height?: number;
+}
+
+const { series, width = 640, height = 240 } = Astro.props;
+
+const nonEmpty = series.filter((s) => s.points.length > 0);
+const allPoints = nonEmpty.flatMap((s) => s.points);
+const hasData = allPoints.length > 0;
+
+let paths: { d: string; color: string; label: string }[] = [];
+
+if (hasData) {
+  const times = allPoints.map((p) => new Date(p.t).getTime());
+  const prices = allPoints.map((p) => p.price);
+  const tMin = Math.min(...times);
+  const tMax = Math.max(...times);
+  const pMin = Math.min(...prices) * 0.97;
+  const pMax = Math.max(...prices) * 1.03;
+  const pad = 40;
+
+  function xScale(t: number): number {
+    if (tMax === tMin) return width / 2;
+    return pad + ((t - tMin) / (tMax - tMin)) * (width - pad * 2);
+  }
+
+  function yScale(p: number): number {
+    if (pMax === pMin) return height / 2;
+    return height - pad - ((p - pMin) / (pMax - pMin)) * (height - pad * 2);
+  }
+
+  const colors = ["#76b900", "#4fc3f7", "#ffb74d", "#ce93d8", "#ef5350"];
+
+  paths = nonEmpty.map((s, i) => ({
+    d: s.points
+      .map((pt, idx) => {
+        const x = xScale(new Date(pt.t).getTime());
+        const y = yScale(pt.price);
+        return `${idx === 0 ? "M" : "L"} ${x.toFixed(2)} ${y.toFixed(2)}`;
+      })
+      .join(" "),
+    color: colors[i % colors.length],
+    label: s.label,
+  }));
+}
+
+const pad = 40;
+---
+
+{hasData ? (
+  <div class="chart-card card">
+    <svg
+      class="price-chart"
+      viewBox={`0 0 ${width} ${height}`}
+      role="img"
+      aria-label="Price history chart"
+    >
+      <line x1={pad} y1={height - pad} x2={width - pad} y2={height - pad} class="axis" />
+      <line x1={pad} y1={pad} x2={pad} y2={height - pad} class="axis" />
+      {paths.map((p) => (
+        <path d={p.d} fill="none" stroke={p.color} stroke-width="2.5" stroke-linecap="round" />
+      ))}
+    </svg>
+    <ul class="chart-legend">
+      {paths.map((p) => (
+        <li>
+          <span class="dot" style={`background:${p.color}`} />
+          {p.label}
+        </li>
+      ))}
+    </ul>
+  </div>
+) : (
+  <p class="chart-empty">No price history in placeholder data yet.</p>
+)}
+
+<style>
+  .chart-card {
+    padding-bottom: 0.75rem;
+  }
+
+  .price-chart {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  .axis {
+    stroke: var(--border);
+    stroke-width: 1;
+  }
+
+  .chart-legend {
+    list-style: none;
+    padding: 0.5rem 0 0;
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1rem;
+    font-size: 0.8rem;
+    color: var(--muted);
+  }
+
+  .chart-legend li {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+  }
+
+  .dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .chart-empty {
+    color: var(--muted);
+    font-size: 0.9rem;
+  }
+</style>
