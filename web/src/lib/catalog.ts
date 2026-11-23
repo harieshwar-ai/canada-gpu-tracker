@@ -9,7 +9,7 @@ import {
 } from "./store";
 
 function isLiveOffer(o: Offer): boolean {
-  return o.isPlaceholder !== true;
+  return o.isPlaceholder === false;
 }
 
 function latestByOffer() {
