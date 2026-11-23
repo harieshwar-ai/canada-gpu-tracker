@@ -1,0 +1,36 @@
+name: Scheduled ingest
+
+on:
+  schedule:
+    - cron: "0 */6 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  ingest-and-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+      - run: npm ci
+      - run: npm run ingest:live
+        env:
+          INGEST_LIVE: "1"
+      - run: npm run build
+      - name: Commit store refresh
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/store.json data/ingest-state.json
+          git diff --staged --quiet || git commit -m "chore: refresh live GPU price observations"
+          git push || true
+      - uses: actions/upload-artifact@v4
+        with:
+          name: static-site-live
+          path: web/dist
+          if-no-files-found: error

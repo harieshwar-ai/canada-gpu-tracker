@@ -1,0 +1,28 @@
+{
+  "pcCanada": [
+    {
+      "url": "https://www.pc-canada.com/item/zotac-nvidia-geforce-rtx-5070-graphic-card/zt-b50700fq-10a",
+      "note": "ZOTAC RTX 5070 AMP"
+    },
+    {
+      "url": "https://www.pc-canada.com/item/msi-rtx-5070-12g-ventus-2x-oc/g5070-12v2c",
+      "note": "MSI RTX 5070 VENTUS 2X OC"
+    }
+  ],
+  "mikesComputerShop": [
+    {
+      "url": "https://www.mikescomputershop.com/product/msi_geforce_rtx_5070_ventus_2x_oc_12gb/83036",
+      "note": "MSI RTX 5070 VENTUS (if reachable)"
+    }
+  ],
+  "canadaComputers": [
+    {
+      "url": "https://www.canadacomputers.com/en/powered-by-nvidia/282429/msi-geforce-rtx-5070-ti-16g-ventus-3x-pz-16gb-gddr7-graphics-card-rtx-5070-ti-16g-ventus-3x-pz-oc.html",
+      "note": "MSI RTX 5070 Ti VENTUS 3X"
+    },
+    {
+      "url": "https://www.canadacomputers.com/en/powered-by-nvidia/283090/zotac-gaming-geforce-rtx-5060-amp-8gb-gddr7-zt-b50600f-10m.html",
+      "note": "ZOTAC RTX 5060 AMP"
+    }
+  ]
+}

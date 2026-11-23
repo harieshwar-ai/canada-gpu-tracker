@@ -4,6 +4,9 @@
   "type": "module",
   "scripts": {
     "ingest": "tsx ingester/run.ts",
+    "ingest:live": "INGEST_LIVE=1 tsx ingester/run.ts",
+    "ingest:dry-run": "INGEST_LIVE=1 INGEST_DRY_RUN=1 tsx ingester/run.ts",
+    "test": "tsx --test ingester/tests/*.test.ts",
     "prebuild": "npm run ingest",
     "build": "npm run build --workspace=web",
     "dev": "npm run dev --workspace=web",

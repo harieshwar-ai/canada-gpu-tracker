@@ -71,8 +71,15 @@ const pageDescription = `Canadian prices and in-store stock for ${card.brand} ${
                 ? latest.priceCad * (1 + tax.taxRate)
                 : null;
             return (
-              <tr>
-                <td>{retailer.name}</td>
+              <tr class={offer.isPlaceholder ? "row-placeholder" : "row-live"}>
+                <td>
+                  {retailer.name}
+                  {offer.isPlaceholder ? (
+                    <span class="pill pill-example">Example</span>
+                  ) : (
+                    <span class="pill pill-live">Live</span>
+                  )}
+                </td>
                 <td>{st ? `${st.city}, ${st.provinceCode}` : "Online"}</td>
                 <td>{offer.condition.replace("_", " ")}</td>
                 <td>{latest ? formatCad(latest.priceCad) : "—"}</td>
@@ -100,7 +107,8 @@ const pageDescription = `Canadian prices and in-store stock for ${card.brand} ${
     <PriceChart series={chart} />
 
     <p class="muted small listing-note">
-      URLs are example.invalid in placeholder mode. Alerts:{" "}
+      Live rows come from cleared ingesters only; Canada Computers product links are kept
+      internal (no outbound links to canadacomputers.com). Alerts:{" "}
       <a href="/alerts/">set a target price</a> for this card.
     </p>
   </main>

@@ -2,7 +2,7 @@
 
 Canada-first NVIDIA GPU price tracker (feature parity target: [rtx.live](https://rtx.live/), adapted for CAD, Canadian retailers, cities/provinces, and shelf stock).
 
-**Placeholder data only** until retailer sources pass ToS / robots review. No scraping or live fetches in this repo.
+**Cleared live ingesters** (PC-Canada, Mike's Computer Shop, Canada Computers) run when `INGEST_LIVE=1`; other retailers remain clearly flagged placeholder rows.
 
 ## Quick start
 
@@ -21,7 +21,21 @@ TypeScript: `types/db.ts` · JSON store v2: `data/store.json` (built by `npm run
 
 ## Ingestion
 
-`Source` adapter → `ingester/run.ts` → `data/store.json`. Only `PlaceholderSource` today. See README section in prior commits for adding cleared sources.
+`Source` adapter → `ingester/run.ts` → `data/store.json`.
+
+- `npm run ingest` — rebuild store from placeholder retailers + last committed live observations.
+- `npm run ingest:live` — polite crawl of cleared retailers (`ingester/config/cleared-skus.json`), obeying robots.txt with `CanadaGPUTrackerBot/0.1`.
+- `npm run ingest:dry-run` — live crawl capped at **2 SKUs per retailer** for verification.
+
+Supabase path stays in `db/migrations/`; production can swap JSON store for Postgres without changing the web schema.
+
+### Cleared retailers
+
+| Retailer | Slug | Notes |
+|----------|------|-------|
+| PC-Canada | `pc-canada` | Product `/item/…` pages; Cloudflare may challenge datacenter IPs |
+| Mike's Computer Shop | `mikes-computer-shop` | `Allow: /` in robots.txt |
+| Canada Computers | `canada-computers` | **No outbound product links** in the UI — internal `/internal/cc/{sku}` only |
 
 ## Web
 
