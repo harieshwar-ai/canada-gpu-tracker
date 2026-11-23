@@ -1,0 +1,42 @@
+---
+import { getLiveChanges, getCardMap, getGpuMap } from "../lib/store";
+import { formatCad } from "../lib/format";
+import { timeAgo } from "../lib/time";
+
+const events = getLiveChanges(8);
+const cardMap = getCardMap();
+const gpuMap = getGpuMap();
+---
+
+<section class="section">
+  <h2 class="section-h">Live changes</h2>
+  <ul class="change-feed">
+    {events.map((ev) => {
+      const card = cardMap.get(ev.cardId);
+      const gpu = card ? gpuMap.get(card.gpuId) : undefined;
+      let detail = "";
+      if (ev.eventType === "price_drop" && ev.priceCad != null && ev.previousPriceCad != null) {
+        const delta = ev.previousPriceCad - ev.priceCad;
+        detail = `−${formatCad(delta)}`;
+      } else if (ev.eventType === "in_stock") {
+        detail = "In stock";
+      } else {
+        detail = "Sold out";
+      }
+      const place = ev.city ? ` · ${ev.city}` : "";
+      return (
+        <li>
+          <a href={card ? `/card/${card.slug}/` : "#"} class="change-main">
+            <span class="change-gpu">{gpu?.modelName.replace("GeForce ", "")}</span>
+            <span class="change-card">{card?.brand} {card?.modelName}</span>
+          </a>
+          <span class="change-meta">
+            {detail}
+            {place} · {timeAgo(ev.occurredAt)}
+            {ev.priceCad != null && ` · ${formatCad(ev.priceCad)}`}
+          </span>
+        </li>
+      );
+    })}
+  </ul>
+</section>

@@ -1,104 +1,31 @@
 ---
 import Layout from "../layouts/Layout.astro";
-import { summarizeGpus, getStore } from "../lib/store";
-import { formatCad } from "../lib/format";
+import PlaceholderBanner from "../components/PlaceholderBanner.astro";
+import HeroStats from "../components/HeroStats.astro";
+import LiveChanges from "../components/LiveChanges.astro";
+import LaunchGrid from "../components/LaunchGrid.astro";
+import CheapestGrid from "../components/CheapestGrid.astro";
+import FreshFinds from "../components/FreshFinds.astro";
+import AlertsTeaser from "../components/AlertsTeaser.astro";
+import ProSection from "../components/ProSection.astro";
+import FAQ from "../components/FAQ.astro";
 
-const store = getStore();
-const rows = summarizeGpus();
-const pageTitle = "Canada GPU Tracker: NVIDIA GPU prices in CAD across Canadian retailers";
+const pageTitle =
+  "Canada GPU Tracker: NVIDIA GPU prices in CAD across Canadian retailers";
 const pageDescription =
-  "Compare NVIDIA GeForce GPU prices in Canadian dollars, stock status, and price history across Canadian retailers. Placeholder data during early development.";
+  "Live-style CAD price tracking, shelf stock by Canadian city, MSRP comparison, open-box finds, alerts, and history for GeForce and RTX PRO — placeholder data during development.";
 ---
 
 <Layout title={pageTitle} description={pageDescription}>
-  {store.placeholder && (
-    <div class="banner-placeholder" role="status">
-      <strong>Placeholder data</strong> — prices and stock shown here are fabricated examples
-      only. No retailer sites are scraped in this build.
-    </div>
-  )}
-
+  <PlaceholderBanner />
   <main class="main">
-    <div class="card">
-      <div class="filters" id="home-filters">
-        <label>
-          Series
-          <select id="filter-series" aria-label="Filter by GPU series">
-            <option value="">All series</option>
-            <option value="50-series">50-series</option>
-            <option value="40-series">40-series</option>
-          </select>
-        </label>
-        <label>
-          <input type="checkbox" id="filter-instock" />
-          In stock only
-        </label>
-      </div>
-
-      <div class="table-wrap">
-        <table class="data-table" id="gpu-table">
-          <thead>
-            <tr>
-              <th>Model</th>
-              <th>VRAM</th>
-              <th>MSRP</th>
-              <th>Lowest price</th>
-              <th>Retailer</th>
-              <th>Stock</th>
-            </tr>
-          </thead>
-          <tbody>
-            {rows.map((row) => (
-              <tr
-                data-series={row.gpu.series}
-                data-instock={row.inStockAnywhere ? "1" : "0"}
-                data-has-offer={row.lowestPriceCad !== null ? "1" : "0"}
-              >
-                <td>
-                  <a href={`/gpu/${row.gpu.slug}/`}>{row.gpu.modelName}</a>
-                </td>
-                <td>{row.gpu.vramGb} GB</td>
-                <td>{formatCad(row.gpu.msrpCad)}</td>
-                <td>
-                  {row.lowestPriceCad !== null
-                    ? formatCad(row.lowestPriceCad)
-                    : "—"}
-                </td>
-                <td>{row.lowestRetailerName ?? "—"}</td>
-                <td>
-                  {row.inStockAnywhere ? (
-                    <span class="badge badge-in">In stock</span>
-                  ) : (
-                    <span class="badge badge-out">No stock</span>
-                  )}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </div>
+    <HeroStats />
+    <LiveChanges />
+    <LaunchGrid />
+    <CheapestGrid />
+    <FreshFinds />
+    <AlertsTeaser />
+    <ProSection />
+    <FAQ />
   </main>
-
-  <script>
-    const seriesSelect = document.getElementById("filter-series") as HTMLSelectElement;
-    const inStockCheck = document.getElementById("filter-instock") as HTMLInputElement;
-    const table = document.getElementById("gpu-table") as HTMLTableElement;
-
-    function applyFilters() {
-      const series = seriesSelect.value;
-      const inStockOnly = inStockCheck.checked;
-      for (const row of table.querySelectorAll("tbody tr")) {
-        const el = row as HTMLTableRowElement;
-        const matchSeries = !series || el.dataset.series === series;
-        const matchStock =
-          !inStockOnly ||
-          (el.dataset.instock === "1" && el.dataset.hasOffer === "1");
-        el.hidden = !(matchSeries && matchStock);
-      }
-    }
-
-    seriesSelect?.addEventListener("change", applyFilters);
-    inStockCheck?.addEventListener("change", applyFilters);
-  </script>
 </Layout>

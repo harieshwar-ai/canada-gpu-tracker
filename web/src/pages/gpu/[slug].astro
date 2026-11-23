@@ -1,102 +1,137 @@
 ---
 import Layout from "../../layouts/Layout.astro";
+import PlaceholderBanner from "../../components/PlaceholderBanner.astro";
 import PriceChart from "../../components/PriceChart.astro";
 import {
   getAllGpus,
   getGpuBySlug,
-  getListingsForGpu,
-  getPriceHistoryForGpu,
-  getStore,
+  getAllCards,
+  getOffersForCard,
+  getPriceHistoryForCard,
 } from "../../lib/store";
 import { formatCad, formatShortDate } from "../../lib/format";
 
 export function getStaticPaths() {
-  return getAllGpus().map((gpu) => ({
-    params: { slug: gpu.slug },
-  }));
+  return getAllGpus().map((gpu) => ({ params: { slug: gpu.slug } }));
 }
 
 const { slug } = Astro.params;
 const gpu = getGpuBySlug(slug!);
-if (!gpu) {
-  return Astro.redirect("/");
-}
+if (!gpu) return Astro.redirect("/");
 
-const store = getStore();
-const listings = getListingsForGpu(gpu.slug);
-const chartSeries = getPriceHistoryForGpu(gpu.slug);
-
-const pageTitle = `${gpu.modelName} — Canada GPU Tracker`;
-const pageDescription = `Canadian retailer prices and stock for ${gpu.modelName} (${gpu.vramGb} GB VRAM). Compare CAD pricing and placeholder price history.`;
+const cards = getAllCards().filter((c) => c.gpuId === gpu.id);
+const pageTitle = `${gpu.modelName} — prices in Canada`;
+const pageDescription = `Compare ${gpu.modelName} CAD prices, stock by store and city, and MSRP delta across Canadian retailers (placeholder data).`;
 ---
 
 <Layout title={pageTitle} description={pageDescription} ogType="article">
-  {store.placeholder && (
-    <div class="banner-placeholder" role="status">
-      <strong>Placeholder data</strong> — listing URLs and prices are examples only.
-    </div>
-  )}
-
+  <PlaceholderBanner />
   <main class="main">
-    <a href="/" class="back-link">← All GPUs</a>
-
+    <a href="/" class="back-link">← Home</a>
     <section class="gpu-hero card">
       <h1>{gpu.modelName}</h1>
       <div class="meta-row">
         <span>{gpu.chip}</span>
-        <span>{gpu.vramGb} GB VRAM</span>
-        <span>MSRP {formatCad(gpu.msrpCad)}</span>
+        <span>{gpu.vramGb} GB</span>
+        <span>Launch MSRP {formatCad(gpu.launchMsrpCad)}</span>
         <span>{gpu.series}</span>
       </div>
     </section>
 
-    <h2 class="section-title">Price history</h2>
-    <PriceChart series={chartSeries} />
+    <h2 class="section-h">Cards ({cards.length})</h2>
+    <div class="filters card">
+      <label>
+        Max length (mm)
+        <select id="filter-len">
+          <option value="">Any</option>
+          <option value="250">≤ 250</option>
+          <option value="300">≤ 300</option>
+          <option value="330">≤ 330</option>
+        </select>
+      </label>
+      <label>
+        Cooling
+        <select id="filter-cool">
+          <option value="">Any</option>
+          <option value="dual">Dual</option>
+          <option value="triple">Triple</option>
+          <option value="single">Single</option>
+        </select>
+      </label>
+      <label>
+        Power
+        <select id="filter-pwr">
+          <option value="">Any</option>
+          <option value="8-pin">8-pin</option>
+          <option value="12V-2x6">12V-2x6</option>
+        </select>
+      </label>
+    </div>
 
-    <h2 class="section-title">Retailer listings</h2>
-    <div class="card table-wrap">
+    <div class="table-wrap card" id="card-table">
       <table class="data-table">
         <thead>
           <tr>
-            <th>Retailer</th>
-            <th>Variant</th>
-            <th>Price</th>
-            <th>Updated</th>
+            <th>Card</th>
+            <th>Specs</th>
+            <th>Lowest</th>
             <th>Stock</th>
           </tr>
         </thead>
         <tbody>
-          {listings.map(({ listing, retailer, latest }) => (
-            <tr>
-              <td>{retailer.name}</td>
-              <td>
-                {listing.brand}
-                {listing.variantLabel ? ` · ${listing.variantLabel}` : ""}
-              </td>
-              <td>{latest ? formatCad(latest.priceCad) : "—"}</td>
-              <td>{latest ? formatShortDate(latest.observedAt) : "—"}</td>
-              <td>
-                {latest?.inStock ? (
-                  <span class="stock-yes">In stock</span>
-                ) : (
-                  <span class="stock-no">Out of stock</span>
-                )}
-              </td>
-            </tr>
-          ))}
+          {cards.map((card) => {
+            const offers = getOffersForCard(card.id);
+            const inStock = offers.filter((o) => o.latest?.inStock);
+            const lowest = inStock.sort(
+              (a, b) => (a.latest!.priceCad) - (b.latest!.priceCad)
+            )[0];
+            return (
+              <tr
+                data-len={card.lengthMm ?? 999}
+                data-cool={card.cooling ?? ""}
+                data-pwr={card.powerConnector ?? ""}
+              >
+                <td>
+                  <a href={`/card/${card.slug}/`}>{card.brand} {card.modelName}</a>
+                </td>
+                <td class="spec-cell">
+                  {card.lengthMm}mm · {card.slotWidth}s · {card.cooling} · {card.powerConnector} ·{" "}
+                  {card.psuWatts}W PSU
+                </td>
+                <td>{lowest?.latest ? formatCad(lowest.latest.priceCad) : "—"}</td>
+                <td>{inStock.length ? `${inStock.length} offers` : "Out"}</td>
+              </tr>
+            );
+          })}
         </tbody>
       </table>
     </div>
-    <p class="listing-note">
-      Product links are disabled in placeholder mode (example.invalid URLs).
-    </p>
-  </main>
-</Layout>
 
-<style>
-  .listing-note {
-    margin-top: 0.75rem;
-    font-size: 0.85rem;
-    color: var(--muted);
-  }
-</style>
+    {cards[0] && (
+      <>
+        <h2 class="section-h">Combined price history (example cards)</h2>
+        <PriceChart series={getPriceHistoryForCard(cards[0].id)} />
+      </>
+    )}
+  </main>
+
+  <script>
+    const len = document.getElementById("filter-len") as HTMLSelectElement;
+    const cool = document.getElementById("filter-cool") as HTMLSelectElement;
+    const pwr = document.getElementById("filter-pwr") as HTMLSelectElement;
+    const rows = document.querySelectorAll("#card-table tbody tr");
+
+    function apply() {
+      const maxLen = len.value ? Number(len.value) : null;
+      rows.forEach((row) => {
+        const el = row as HTMLTableRowElement;
+        const L = Number(el.dataset.len);
+        const okLen = maxLen == null || L <= maxLen;
+        const okCool = !cool.value || el.dataset.cool === cool.value;
+        const okPwr = !pwr.value || el.dataset.pwr === pwr.value;
+        el.hidden = !(okLen && okCool && okPwr);
+      });
+    }
+    [len, cool, pwr].forEach((el) => el?.addEventListener("change", apply));
+  </script>
+</Layout>

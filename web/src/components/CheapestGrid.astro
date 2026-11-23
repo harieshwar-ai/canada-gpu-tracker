@@ -1,0 +1,48 @@
+---
+import { getCheapestPerGpu } from "../lib/store";
+import { formatCad } from "../lib/format";
+
+const rows = getCheapestPerGpu();
+const retailerShort: Record<string, string> = {
+  "Best Buy Canada": "BB",
+  "Canada Computers": "CC",
+  "Memory Express": "ME",
+  "Newegg.ca": "NE",
+  "Amazon.ca": "AMZ",
+  "Walmart.ca": "WM",
+  "eBay.ca": "eBay",
+};
+---
+
+<section class="section">
+  <h2 class="section-h">Cheapest in stock, per GPU</h2>
+  {rows.map((row) => (
+    <article class="cheap-row card">
+      <a href={`/gpu/${row.gpu.slug}/`} class="cheap-gpu">
+        <strong>{row.gpu.modelName.replace("GeForce ", "")}</strong>
+        <span class="spec-line">{row.specLine}</span>
+      </a>
+      <div class="cheap-price">
+        {row.cheapestPrice != null ? (
+          <>
+            <span class="big">{formatCad(row.cheapestPrice)}</span>
+            <span class="retailer">{row.retailer?.name}</span>
+            {row.pctOverMsrp != null && (
+              <span class="pct">{row.pctOverMsrp > 0 ? `+${row.pctOverMsrp}%` : `${row.pctOverMsrp}%`}</span>
+            )}
+          </>
+        ) : (
+          <span class="muted">No in-stock offers</span>
+        )}
+      </div>
+      <div class="chips">
+        {row.chips.map((c) => (
+          <span class="chip">
+            {retailerShort[c.retailer.name] ?? c.retailer.name.slice(0, 4)}{" "}
+            {formatCad(c.priceCad)}
+          </span>
+        ))}
+      </div>
+    </article>
+  ))}
+</section>

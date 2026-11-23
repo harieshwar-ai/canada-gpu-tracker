@@ -5,62 +5,113 @@ import type {
   TrackerStore,
   Gpu,
   Retailer,
-  Listing,
+  Store,
+  Card,
+  Offer,
   PriceObservation,
+  ChangeEvent,
 } from "../types/db";
-import type { NormalizedObservationInput } from "./source";
+import type {
+  NormalizedObservationInput,
+  NormalizedChangeEventInput,
+} from "./source";
 import { PlaceholderSource } from "./sources/placeholder";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..");
 const OUT_PATH = path.join(ROOT, "data", "store.json");
 
-function listingKey(retailerSlug: string, sku: string): string {
-  return `${retailerSlug}::${sku}`;
+function offerKey(
+  retailerSlug: string,
+  sku: string,
+  storeSlug?: string
+): string {
+  return `${retailerSlug}::${storeSlug ?? "online"}::${sku}`;
 }
 
-function buildListings(
+function buildOffers(
   observations: NormalizedObservationInput[],
-  gpuBySlug: Map<string, Gpu>,
-  retailerBySlug: Map<string, Retailer>
-): Map<string, Listing> {
-  const listings = new Map<string, Listing>();
+  cardBySlug: Map<string, Card>,
+  retailerBySlug: Map<string, Retailer>,
+  storeBySlug: Map<string, Store>
+): Map<string, Offer> {
+  const offers = new Map<string, Offer>();
   for (const obs of observations) {
-    const key = listingKey(obs.retailerSlug, obs.sku);
-    if (listings.has(key)) continue;
-    const gpu = gpuBySlug.get(obs.gpuSlug);
+    const key = offerKey(obs.retailerSlug, obs.sku, obs.storeSlug);
+    if (offers.has(key)) continue;
+    const card = cardBySlug.get(obs.cardSlug);
     const retailer = retailerBySlug.get(obs.retailerSlug);
-    if (!gpu || !retailer) {
-      throw new Error(`Unknown gpu or retailer for observation: ${obs.gpuSlug}/${obs.retailerSlug}`);
+    const store = obs.storeSlug ? storeBySlug.get(obs.storeSlug) : undefined;
+    if (!card || !retailer) {
+      throw new Error(`Unknown card/retailer: ${obs.cardSlug}/${obs.retailerSlug}`);
     }
-    listings.set(key, {
-      id: `listing-${retailer.slug}-${obs.sku.toLowerCase()}`,
-      gpuId: gpu.id,
+    if (obs.storeSlug && !store) {
+      throw new Error(`Unknown store: ${obs.storeSlug}`);
+    }
+    offers.set(key, {
+      id: `offer-${key.replace(/::/g, "-").toLowerCase()}`,
+      gpuId: card.gpuId,
+      cardId: card.id,
       retailerId: retailer.id,
+      storeId: store?.id ?? null,
       sku: obs.sku,
       productUrl: obs.productUrl,
-      brand: obs.brand,
-      variantLabel: obs.variantLabel ?? null,
+      brand: card.brand,
+      variantLabel: card.modelName,
+      condition: obs.condition ?? "new",
       createdAt: obs.observedAt,
       updatedAt: obs.observedAt,
     });
   }
-  return listings;
+  return offers;
 }
 
 function buildPriceObservations(
   observations: NormalizedObservationInput[],
-  listings: Map<string, Listing>
+  offers: Map<string, Offer>
 ): PriceObservation[] {
   return observations.map((obs, index) => {
-    const listing = listings.get(listingKey(obs.retailerSlug, obs.sku));
-    if (!listing) throw new Error(`Missing listing for ${obs.sku}`);
+    const offer = offers.get(
+      offerKey(obs.retailerSlug, obs.sku, obs.storeSlug)
+    );
+    if (!offer) throw new Error(`Missing offer for ${obs.sku}`);
     return {
-      id: `obs-${listing.id}-${index}`,
-      listingId: listing.id,
+      id: `obs-${offer.id}-${index}`,
+      offerId: offer.id,
       priceCad: obs.priceCad,
       inStock: obs.inStock,
       observedAt: obs.observedAt,
+    };
+  });
+}
+
+function buildChangeEvents(
+  events: NormalizedChangeEventInput[],
+  cardBySlug: Map<string, Card>,
+  offers: Map<string, Offer>,
+  storeBySlug: Map<string, Store>
+): ChangeEvent[] {
+  return events.map((ev, index) => {
+    const card = cardBySlug.get(ev.cardSlug);
+    if (!card) throw new Error(`Unknown card for event: ${ev.cardSlug}`);
+    let offerId: string | null = null;
+    if (ev.offerSku) {
+      const offer = [...offers.values()].find((o) => o.sku === ev.offerSku);
+      offerId = offer?.id ?? null;
+    }
+    const store = ev.storeSlug ? storeBySlug.get(ev.storeSlug) : undefined;
+    return {
+      id: `chg-${index}`,
+      eventType: ev.eventType,
+      offerId,
+      cardId: card.id,
+      storeId: store?.id ?? null,
+      priceCad: ev.priceCad ?? null,
+      previousPriceCad: ev.previousPriceCad ?? null,
+      inStock: ev.inStock ?? null,
+      city: store?.city ?? null,
+      provinceCode: store?.provinceCode ?? null,
+      occurredAt: ev.occurredAt,
     };
   });
 }
@@ -71,32 +122,48 @@ async function main(): Promise<void> {
 
   const gpus = result.gpus ?? [];
   const retailers = result.retailers ?? [];
-  const gpuBySlug = new Map(gpus.map((g) => [g.slug, g]));
+  const stores = result.stores ?? [];
+  const cards = result.cards ?? [];
+  const cardBySlug = new Map(cards.map((c) => [c.slug, c]));
   const retailerBySlug = new Map(retailers.map((r) => [r.slug, r]));
+  const storeBySlug = new Map(stores.map((s) => [s.slug, s]));
 
-  const listingsMap = buildListings(
+  const offersMap = buildOffers(
     result.observations,
-    gpuBySlug,
-    retailerBySlug
+    cardBySlug,
+    retailerBySlug,
+    storeBySlug
   );
   const priceObservations = buildPriceObservations(
     result.observations,
-    listingsMap
+    offersMap
+  );
+  const changeEvents = buildChangeEvents(
+    result.changeEvents ?? [],
+    cardBySlug,
+    offersMap,
+    storeBySlug
   );
 
   const store: TrackerStore = {
-    version: 1,
+    version: 2,
     placeholder: true,
     generatedAt: new Date().toISOString(),
     gpus,
     retailers,
-    listings: [...listingsMap.values()],
+    stores,
+    cards,
+    offers: [...offersMap.values()],
     priceObservations,
+    changeEvents,
+    provinceTaxes: result.provinceTaxes ?? [],
   };
 
   await mkdir(path.dirname(OUT_PATH), { recursive: true });
   await writeFile(OUT_PATH, JSON.stringify(store, null, 2) + "\n", "utf8");
-  console.log(`Wrote ${OUT_PATH} (${store.listings.length} listings, ${store.priceObservations.length} observations)`);
+  console.log(
+    `Wrote ${OUT_PATH} (${store.cards.length} cards, ${store.offers.length} offers, ${store.priceObservations.length} observations)`
+  );
 }
 
 main().catch((err) => {

@@ -1,0 +1,31 @@
+---
+import { getSiteStats } from "../lib/store";
+
+const stats = getSiteStats();
+---
+
+<section class="hero">
+  <h1>NVIDIA RTX prices &amp; shelf stock in Canada</h1>
+  <p class="hero-lead">
+    Shelf stock at Canada Computers, Memory Express and Best Buy stores, alongside Newegg.ca,
+    Amazon.ca, Walmart.ca and more — compared to NVIDIA Canada launch MSRP in CAD.
+  </p>
+  <dl class="stat-grid">
+    <div>
+      <dt>Cards tracked</dt>
+      <dd>{stats.cardsTracked.toLocaleString("en-CA")}</dd>
+    </div>
+    <div>
+      <dt>Stores</dt>
+      <dd>{stats.stores.toLocaleString("en-CA")}</dd>
+    </div>
+    <div>
+      <dt>Offers in stock</dt>
+      <dd>{stats.offersInStock.toLocaleString("en-CA")}</dd>
+    </div>
+    <div>
+      <dt>Retailers</dt>
+      <dd>{stats.retailers.toLocaleString("en-CA")}</dd>
+    </div>
+  </dl>
+</section>

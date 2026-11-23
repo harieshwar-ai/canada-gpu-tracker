@@ -1,23 +1,49 @@
-import type { PriceObservation, Listing, Gpu, Retailer } from "../types/db";
+import type {
+  Gpu,
+  Retailer,
+  Store,
+  Card,
+  Offer,
+  ChangeEvent,
+  ProvinceTax,
+  OfferCondition,
+  ChangeEventType,
+} from "../types/db";
 
 /** Raw row from a cleared source before IDs are assigned. */
 export interface NormalizedObservationInput {
-  gpuSlug: string;
+  cardSlug: string;
   retailerSlug: string;
+  storeSlug?: string;
   sku: string;
   productUrl: string;
-  brand: string;
-  variantLabel?: string;
+  condition?: OfferCondition;
   priceCad: number;
   inStock: boolean;
   observedAt: string;
 }
 
+export interface NormalizedChangeEventInput {
+  eventType: ChangeEventType;
+  cardSlug: string;
+  retailerSlug?: string;
+  storeSlug?: string;
+  offerSku?: string;
+  priceCad?: number;
+  previousPriceCad?: number;
+  inStock?: boolean;
+  occurredAt: string;
+}
+
 export interface NormalizedFetchResult {
   gpus?: Gpu[];
   retailers?: Retailer[];
-  listings?: Listing[];
+  stores?: Store[];
+  cards?: Card[];
+  offers?: Offer[];
+  provinceTaxes?: ProvinceTax[];
   observations: NormalizedObservationInput[];
+  changeEvents?: NormalizedChangeEventInput[];
 }
 
 /**

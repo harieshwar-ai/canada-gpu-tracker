@@ -47,10 +47,15 @@ const contactEmail = "harieshwar.dev@gmail.com";
   </head>
   <body>
     <header class="site-header">
-      <a href="/" class="logo">
-        <span class="logo-flag" aria-hidden="true">🇨🇦</span>
-        Canada GPU Tracker
-      </a>
+      <div class="header-row">
+        <a href="/" class="logo">
+          <span class="logo-flag" aria-hidden="true">🇨🇦</span>
+          Canada GPU Tracker
+        </a>
+        <nav class="header-nav">
+          <a href="/alerts/">Alerts</a>
+        </nav>
+      </div>
       <p class="tagline">NVIDIA prices in CAD across Canadian retailers</p>
     </header>
     <slot />
@@ -126,6 +131,18 @@ const contactEmail = "harieshwar.dev@gmail.com";
     padding: 1.25rem 1rem 0.5rem;
     max-width: 1100px;
     margin: 0 auto;
+  }
+
+  .header-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .header-nav a {
+    font-size: 0.9rem;
+    font-weight: 600;
   }
 
   .logo {
@@ -293,5 +310,295 @@ const contactEmail = "harieshwar.dev@gmail.com";
     display: inline-block;
     margin-bottom: 0.75rem;
     font-size: 0.9rem;
+  }
+
+  .section {
+    margin: 2rem 0 1.5rem;
+  }
+
+  .section-h {
+    font-size: 1.15rem;
+    margin: 0 0 0.75rem;
+    font-weight: 700;
+  }
+
+  .hero h1 {
+    font-size: clamp(1.35rem, 3vw, 1.85rem);
+    margin: 0 0 0.5rem;
+    line-height: 1.25;
+  }
+
+  .hero-lead {
+    color: var(--muted);
+    margin: 0 0 1.25rem;
+    max-width: 52rem;
+  }
+
+  .stat-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+    margin: 0;
+  }
+
+  @media (min-width: 640px) {
+    .stat-grid {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+
+  .stat-grid dt {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--muted);
+    margin: 0;
+  }
+
+  .stat-grid dd {
+    margin: 0.15rem 0 0;
+    font-size: 1.5rem;
+    font-weight: 700;
+  }
+
+  .change-feed {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: var(--surface);
+    overflow: hidden;
+  }
+
+  .change-feed li {
+    padding: 0.65rem 0.85rem;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem 1rem;
+    justify-content: space-between;
+    font-size: 0.9rem;
+  }
+
+  .change-feed li:last-child {
+    border-bottom: none;
+  }
+
+  .change-main {
+    color: var(--text);
+    text-decoration: none;
+  }
+
+  .change-gpu {
+    font-weight: 600;
+    margin-right: 0.35rem;
+  }
+
+  .change-card {
+    color: var(--muted);
+  }
+
+  .change-meta {
+    color: var(--muted);
+    font-size: 0.85rem;
+  }
+
+  .launch-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 0.65rem;
+  }
+
+  .launch-card {
+    text-decoration: none;
+    color: var(--text);
+    display: block;
+  }
+
+  .launch-card h3 {
+    margin: 0;
+    font-size: 0.95rem;
+  }
+
+  .launch-sub,
+  .launch-price,
+  .launch-stock {
+    margin: 0.25rem 0 0;
+    font-size: 0.8rem;
+    color: var(--muted);
+  }
+
+  .launch-cad {
+    font-size: 1.05rem;
+    font-weight: 700;
+    margin: 0.35rem 0 0;
+  }
+
+  .over {
+    color: var(--out-stock);
+    margin-left: 0.35rem;
+    font-size: 0.85rem;
+  }
+
+  .under {
+    color: var(--in-stock);
+    margin-left: 0.35rem;
+    font-size: 0.85rem;
+  }
+
+  .cheap-row {
+    margin-bottom: 0.65rem;
+    display: grid;
+    gap: 0.5rem;
+  }
+
+  @media (min-width: 768px) {
+    .cheap-row {
+      grid-template-columns: 1fr auto;
+      align-items: center;
+    }
+  }
+
+  .cheap-gpu {
+    color: var(--text);
+    text-decoration: none;
+  }
+
+  .spec-line {
+    display: block;
+    font-size: 0.8rem;
+    color: var(--muted);
+    font-weight: 400;
+  }
+
+  .cheap-price .big {
+    font-size: 1.15rem;
+    font-weight: 700;
+    margin-right: 0.5rem;
+  }
+
+  .chips {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+  }
+
+  .chip {
+    font-size: 0.75rem;
+    padding: 0.2rem 0.45rem;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: var(--bg);
+  }
+
+  .tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .tab {
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text);
+    padding: 0.35rem 0.65rem;
+    border-radius: 999px;
+    font-size: 0.85rem;
+    cursor: pointer;
+  }
+
+  .tab.active {
+    border-color: var(--accent);
+    background: color-mix(in srgb, var(--accent) 18%, var(--surface));
+  }
+
+  .fresh-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .fresh-item {
+    padding: 0.65rem 0;
+    border-bottom: 1px solid var(--border);
+    display: grid;
+    gap: 0.2rem;
+  }
+
+  .fresh-title {
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .fresh-meta {
+    font-size: 0.85rem;
+    color: var(--muted);
+  }
+
+  .fresh-price .was {
+    text-decoration: line-through;
+    color: var(--muted);
+    margin-right: 0.5rem;
+  }
+
+  .drop {
+    color: var(--in-stock);
+    margin-left: 0.35rem;
+  }
+
+  .brand-counts {
+    margin-top: 0.75rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1rem;
+    font-size: 0.8rem;
+    color: var(--muted);
+  }
+
+  .faq-list {
+    margin: 0;
+  }
+
+  .faq-item {
+    margin-bottom: 1rem;
+  }
+
+  .faq-item dt {
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+  }
+
+  .faq-item dd {
+    margin: 0;
+    color: var(--muted);
+    font-size: 0.95rem;
+  }
+
+  .pro-grid {
+    display: grid;
+    gap: 0.65rem;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  }
+
+  .pro-card {
+    text-decoration: none;
+    color: var(--text);
+  }
+
+  .muted {
+    color: var(--muted);
+  }
+
+  .small {
+    font-size: 0.85rem;
+  }
+
+  .pct {
+    font-size: 0.85rem;
+    color: var(--muted);
+    margin-left: 0.35rem;
   }
 </style>

@@ -1,0 +1,40 @@
+---
+const items = [
+  {
+    q: "How often are prices and stock checked?",
+    a: "Placeholder schedule: physical stores (Canada Computers, Memory Express, Best Buy) would be polled about every 30 minutes once cleared sources exist; online retailers every few hours. This build shows static example snapshots only.",
+  },
+  {
+    q: "What does “above MSRP” mean?",
+    a: "We compare in-stock CAD prices with NVIDIA’s Canada launch MSRP for the GPU class. Factory-overclocked partner cards often launch above that reference, so a small premium can still be typical.",
+  },
+  {
+    q: "Is a partner card better than a Founders Edition?",
+    a: "Same GPU silicon; differences are cooler design, noise, clocks, length, slot width and power connector. Use size, cooling and power filters on card listings to match your case and PSU.",
+  },
+  {
+    q: "What power supply do I need?",
+    a: "Each card page lists manufacturer PSU guidance and connector type. Most mid-range and up RTX 40/50 cards use 12V-2x6 (12VHPWR) on ATX 3.x supplies, or adapters where noted.",
+  },
+  {
+    q: "Open box vs refurbished?",
+    a: "Open-box units are customer returns resold at a discount (often in-store). Refurbished units are repaired and re-certified, usually with a shorter warranty. Both appear as separate offer conditions in our schema.",
+  },
+  {
+    q: "How are distances calculated?",
+    a: "Alerts and store stock can use postal codes or map coordinates to filter within a radius in kilometres. Taxes are indicative by province (GST/HST/QST) for display only in placeholder mode.",
+  },
+];
+---
+
+<section class="section faq">
+  <h2 class="section-h">Questions buyers ask</h2>
+  <dl class="faq-list">
+    {items.map((item) => (
+      <div class="faq-item">
+        <dt>{item.q}</dt>
+        <dd>{item.a}</dd>
+      </div>
+    ))}
+  </dl>
+</section>
