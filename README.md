@@ -4,7 +4,7 @@ Canada-first NVIDIA GPU price tracker (feature parity target: [rtx.live](https:/
 
 **Placeholder data only** until retailer sources pass ToS / robots review. No scraping or live fetches in this repo.
 
-**UX spec:** [`docs/rtx-live-spec.md`](docs/rtx-live-spec.md) — internal reference screenshots in [`docs/reference/rtx-live/`](docs/reference/rtx-live/) (not shipped to users).
+**UX spec:** [`docs/rtx-live-spec.md`](docs/rtx-live-spec.md) (numbered checklists per section) · **Phase 2 status:** [`docs/rtx-live-spec-impl-status.md`](docs/rtx-live-spec-impl-status.md) · **rtx vs ours screenshots:** [`docs/compare/`](docs/compare/) · internal rtx reference: [`docs/reference/rtx-live/`](docs/reference/rtx-live/).
 
 ## Quick start
 
@@ -27,4 +27,4 @@ TypeScript: `types/db.ts` · JSON store v2: `data/store.json` (built by `npm run
 
 ## Web
 
-Static Astro site: home sections (hero stats, live changes, 50-series MSRP grid, cheapest per GPU, fresh finds tabs, alerts CTA, RTX PRO, FAQ), `/gpu/`, `/card/`, `/alerts/` with localStorage alert stub.
+Static Astro site aligned to the spec: `/`, `/gpus/*`, `/cards/*`, deals/discovery routes, stores, preferences, `/alerts/` localStorage stub. Legacy `/gpu/*` and `/card/*` redirect to new paths.
