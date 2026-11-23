@@ -1,0 +1,194 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import PlaceholderBanner from "../../components/PlaceholderBanner.astro";
+import { getAllCards, getAllGpus } from "../../lib/store";
+
+const gpus = getAllGpus().filter((g) => g.productLine === "geforce");
+const cards = getAllCards();
+const pageTitle = "Price & stock alerts — Canada GPU Tracker";
+const pageDescription =
+  "Create placeholder alerts by card, GPU, or product line with target CAD price and distance in km (local storage stub; no email).";
+---
+
+<Layout title={pageTitle} description={pageDescription}>
+  <PlaceholderBanner />
+  <main id="main" class="page-wrap narrow">
+    <h1>Alerts</h1>
+    <p class="lead">
+      Price and stock alerts for a card, whole GPU, or RTX PRO line. Target price in CAD and optional
+      max distance in km from your postal code. Live system would check every ~30 minutes.
+    </p>
+
+    <form id="alert-form" class="card alert-form">
+      <label>
+        Scope
+        <select name="alertScope" required id="scope">
+          <option value="card">Specific card</option>
+          <option value="gpu">Whole GPU model</option>
+          <option value="product_line">Product line (RTX PRO)</option>
+        </select>
+      </label>
+
+      <label id="card-field">
+        Card
+        <select name="cardSlug">
+          <option value="">Select…</option>
+          {cards.map((c) => (
+            <option value={c.slug}>
+              {c.brand} {c.modelName}
+            </option>
+          ))}
+        </select>
+      </label>
+
+      <label id="gpu-field" hidden>
+        GPU
+        <select name="gpuSlug">
+          <option value="">Select…</option>
+          {gpus.map((g) => (
+            <option value={g.slug}>{g.modelName}</option>
+          ))}
+        </select>
+      </label>
+
+      <label id="line-field" hidden>
+        Product line
+        <select name="productLine">
+          <option value="rtx_pro">RTX PRO</option>
+          <option value="geforce">GeForce</option>
+        </select>
+      </label>
+
+      <label>
+        Target price (CAD)
+        <input type="number" name="targetPriceCad" min="1" step="0.01" required placeholder="999.00" />
+      </label>
+
+      <label>
+        Max distance (km, optional)
+        <input type="number" name="maxDistanceKm" min="0" step="1" placeholder="50" />
+      </label>
+
+      <label>
+        Postal code (optional)
+        <input type="text" name="postalCode" placeholder="M5V 3A8" maxlength="7" />
+      </label>
+
+      <label>
+        Email (stub only — not sent)
+        <input type="email" name="contactEmail" placeholder="optional@example.com" />
+      </label>
+
+      <button type="submit" class="btn">Save placeholder alert</button>
+      <p id="alert-status" class="status" role="status"></p>
+    </form>
+
+    <section class="card api-stub">
+      <h2>API stub contract</h2>
+      <pre><code>{`POST /api/alerts
+{
+  "alertScope": "card" | "gpu" | "product_line",
+  "cardSlug"?: string,
+  "gpuSlug"?: string,
+  "productLine"?: "geforce" | "rtx_pro",
+  "targetPriceCad": number,
+  "maxDistanceKm"?: number,
+  "postalCode"?: string
+}`}</code></pre>
+      <p class="muted small">
+        Persisted in <code>price_alerts</code> table when a backend is added. This static build uses
+        <code>stubCreateAlert</code> → localStorage only.
+      </p>
+    </section>
+  </main>
+
+  <script>
+    import { stubCreateAlert } from "../../lib/alerts-api";
+    import type { CreateAlertRequest } from "../../lib/alerts-api";
+
+    const form = document.getElementById("alert-form") as HTMLFormElement;
+    const scope = document.getElementById("scope") as HTMLSelectElement;
+    const cardField = document.getElementById("card-field") as HTMLLabelElement;
+    const gpuField = document.getElementById("gpu-field") as HTMLLabelElement;
+    const lineField = document.getElementById("line-field") as HTMLLabelElement;
+    const status = document.getElementById("alert-status") as HTMLParagraphElement;
+
+    scope.addEventListener("change", () => {
+      const v = scope.value;
+      cardField.hidden = v !== "card";
+      gpuField.hidden = v !== "gpu";
+      lineField.hidden = v !== "product_line";
+    });
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const fd = new FormData(form);
+      const body: Partial<CreateAlertRequest> = {
+        alertScope: fd.get("alertScope") as CreateAlertRequest["alertScope"],
+        targetPriceCad: Number(fd.get("targetPriceCad")),
+        maxDistanceKm: fd.get("maxDistanceKm")
+          ? Number(fd.get("maxDistanceKm"))
+          : undefined,
+        postalCode: String(fd.get("postalCode") || "") || undefined,
+        contactEmail: String(fd.get("contactEmail") || "") || undefined,
+        cardSlug: String(fd.get("cardSlug") || "") || undefined,
+        gpuSlug: String(fd.get("gpuSlug") || "") || undefined,
+        productLine: (fd.get("productLine") as CreateAlertRequest["productLine"]) || undefined,
+      };
+      const res = await stubCreateAlert(body as CreateAlertRequest);
+      status.textContent = res.message;
+      status.className = res.ok ? "status ok" : "status err";
+    });
+  </script>
+</Layout>
+
+<style>
+  .narrow {
+    max-width: 640px;
+  }
+  .lead {
+    color: var(--muted);
+  }
+  .alert-form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin: 1.25rem 0;
+  }
+  .alert-form label {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    font-size: 0.9rem;
+  }
+  .alert-form input,
+  .alert-form select {
+    padding: 0.5rem;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    color: var(--text);
+  }
+  .btn {
+    display: inline-block;
+    padding: 0.6rem 1rem;
+    background: var(--accent);
+    color: #0b0f14;
+    font-weight: 600;
+    border: none;
+    border-radius: 8px;
+    text-decoration: none;
+    cursor: pointer;
+    width: fit-content;
+  }
+  .status.ok {
+    color: var(--in-stock);
+  }
+  .status.err {
+    color: var(--out-stock);
+  }
+  .api-stub pre {
+    overflow-x: auto;
+    font-size: 0.8rem;
+  }
+</style>

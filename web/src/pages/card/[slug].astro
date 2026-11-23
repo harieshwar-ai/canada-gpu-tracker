@@ -1,0 +1,10 @@
+---
+import { getAllCards } from "../../lib/store";
+
+export function getStaticPaths() {
+  return getAllCards().map((c) => ({ params: { slug: c.slug } }));
+}
+
+const { slug } = Astro.params;
+return Astro.redirect(`/cards/${slug}/`, 301);
+---

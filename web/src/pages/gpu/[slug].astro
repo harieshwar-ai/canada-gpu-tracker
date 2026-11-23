@@ -1,0 +1,11 @@
+---
+import { getAllGpus } from "../../lib/store";
+import { gpuUrl } from "../../lib/routes";
+
+export function getStaticPaths() {
+  return getAllGpus().map((g) => ({ params: { slug: g.slug } }));
+}
+
+const { slug } = Astro.params;
+return Astro.redirect(gpuUrl(slug!), 301);
+---

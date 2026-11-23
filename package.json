@@ -1,0 +1,19 @@
+{
+  "name": "canada-gpu-tracker",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "ingest": "tsx ingester/run.ts",
+    "prebuild": "npm run ingest",
+    "build": "npm run build --workspace=web",
+    "dev": "npm run dev --workspace=web",
+    "preview": "npm run preview --workspace=web"
+  },
+  "workspaces": [
+    "web"
+  ],
+  "devDependencies": {
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2"
+  }
+}

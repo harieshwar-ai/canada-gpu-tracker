@@ -1,0 +1,41 @@
+---
+import { getSiteStats, getStore } from "../lib/store";
+import { timeAgo } from "../lib/time";
+
+const stats = getSiteStats();
+const updated = getStore().generatedAt;
+---
+
+<section class="hero">
+  <p class="live-pill">
+    Live · updated <strong>{timeAgo(updated)}</strong>
+  </p>
+  <h1 class="hero-title">NVIDIA RTX prices &amp; in-store stock in Canada.</h1>
+  <p class="hero-lead">
+    Shelf stock at Canada Computers, Memory Express and Best Buy stores, alongside Newegg.ca,
+    Amazon.ca, Walmart.ca and more — against NVIDIA Canada launch MSRP in CAD.
+  </p>
+  <div class="hero-ctas">
+    <a href="/cards/?avail=stock" class="btn-primary">In stock now</a>
+    <a href="/cards/" class="btn-secondary">Browse all cards</a>
+    <a href="/finder/" class="btn-secondary">Finder</a>
+  </div>
+  <dl class="stat-row">
+    <div class="stat-tile">
+      <dd>{stats.cardsTracked}</dd>
+      <dt>cards tracked</dt>
+    </div>
+    <div class="stat-tile">
+      <dd>{stats.stores}</dd>
+      <dt>stores</dt>
+    </div>
+    <div class="stat-tile">
+      <dd>{stats.offersInStock}</dd>
+      <dt>offers in stock</dt>
+    </div>
+    <div class="stat-tile">
+      <dd>{stats.retailers}</dd>
+      <dt>retailers</dt>
+    </div>
+  </dl>
+</section>

@@ -1,0 +1,24 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import PlaceholderBanner from "../../components/PlaceholderBanner.astro";
+import { getFreshFinds } from "../../lib/store";
+import { formatCad } from "../../lib/format";
+import { cardUrl } from "../../lib/routes";
+
+const items = getFreshFinds("drops");
+---
+
+<Layout title="Deals — Canada GPU Tracker" description="CAD price drops (placeholder).">
+  <main id="main" class="page-wrap">
+    <PlaceholderBanner />
+    <h1>Deals</h1>
+    <ul class="fresh-list panel" style="padding:0.75rem">
+      {items.map((f) => (
+        <li class="fresh-item">
+          <a href={cardUrl(f.card.slug)}>{f.card.brand} {f.card.modelName}</a>
+          <span class="muted small">{f.retailer.name} · {formatCad(f.priceCad)} {f.pctChange}%</span>
+        </li>
+      ))}
+    </ul>
+  </main>
+</Layout>

@@ -1,0 +1,40 @@
+---
+const items = [
+  {
+    q: "How often are prices and stock checked?",
+    a: "Placeholder schedule: physical stores (Canada Computers, Memory Express, Best Buy) would be polled about every 30 minutes once cleared sources exist; online retailers every few hours.",
+  },
+  {
+    q: "What does “above MSRP” mean?",
+    a: "We compare in-stock CAD prices with NVIDIA’s Canada launch MSRP for the GPU class.",
+  },
+  {
+    q: "Is a partner card better than a Founders Edition?",
+    a: "Same GPU silicon; differences are cooler design, noise, clocks, length, slot width and power connector.",
+  },
+  {
+    q: "What power supply do I need?",
+    a: "Each card page lists manufacturer PSU guidance and connector type.",
+  },
+  {
+    q: "Open box vs refurbished?",
+    a: "Open-box units are customer returns; refurbished units are re-certified with shorter warranties.",
+  },
+];
+---
+
+<section class="section faq panel" style="padding:0.75rem">
+  <h2 class="section-head"><span>Questions buyers ask</span></h2>
+  {items.map((item) => (
+    <details class="faq-item">
+      <summary>{item.q}</summary>
+      <p>{item.a}</p>
+    </details>
+  ))}
+</section>
+
+<style>
+  .faq-item { border-bottom: 1px solid var(--border); padding: 0.5rem 0; }
+  .faq-item summary { cursor: pointer; font-weight: 600; }
+  .faq-item p { color: var(--muted); font-size: 0.9rem; margin: 0.35rem 0 0; }
+</style>

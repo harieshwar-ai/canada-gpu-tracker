@@ -1,0 +1,190 @@
+---
+interface Series {
+  offerId: string;
+  label: string;
+  points: { t: string; price: number }[];
+}
+
+interface Props {
+  series: Series[];
+  width?: number;
+  height?: number;
+}
+
+const { series, width = 720, height = 280 } = Astro.props;
+
+const nonEmpty = series.filter((s) => s.points.length > 0);
+const allPoints = nonEmpty.flatMap((s) => s.points);
+const hasData = allPoints.length > 0;
+
+let paths: { d: string; color: string; label: string }[] = [];
+let yLabels: { y: number; text: string }[] = [];
+let xLabels: { x: number; text: string }[] = [];
+
+const padL = 56;
+const padR = 16;
+const padT = 16;
+const padB = 40;
+
+if (hasData) {
+  const times = allPoints.map((p) => new Date(p.t).getTime());
+  const prices = allPoints.map((p) => p.price);
+  const tMin = Math.min(...times);
+  const tMax = Math.max(...times);
+  const pMin = Math.min(...prices) * 0.98;
+  const pMax = Math.max(...prices) * 1.02;
+
+  const xScale = (t: number) =>
+    tMax === tMin
+      ? (padL + width - padR) / 2
+      : padL + ((t - tMin) / (tMax - tMin)) * (width - padL - padR);
+
+  const yScale = (p: number) =>
+    pMax === pMin
+      ? (height - padB) / 2
+      : height - padB - ((p - pMin) / (pMax - pMin)) * (height - padT - padB);
+
+  const fmt = new Intl.NumberFormat("en-CA", {
+    style: "currency",
+    currency: "CAD",
+    maximumFractionDigits: 0,
+  });
+
+  yLabels = [pMin, (pMin + pMax) / 2, pMax].map((p) => ({
+    y: yScale(p),
+    text: fmt.format(p),
+  }));
+
+  const tMid = (tMin + tMax) / 2;
+  xLabels = [tMin, tMid, tMax].map((t) => ({
+    x: xScale(t),
+    text: new Intl.DateTimeFormat("en-CA", { month: "short", day: "numeric" }).format(
+      new Date(t)
+    ),
+  }));
+
+  const colors = ["#76b900", "#5eb8ff", "#ffb74d", "#ce93d8", "#ef5350", "#80cbc4"];
+
+  paths = nonEmpty.map((s, i) => ({
+    d: s.points
+      .map((pt, idx) => {
+        const x = xScale(new Date(pt.t).getTime());
+        const y = yScale(pt.price);
+        return `${idx === 0 ? "M" : "L"} ${x.toFixed(2)} ${y.toFixed(2)}`;
+      })
+      .join(" "),
+    color: colors[i % colors.length],
+    label: s.label,
+  }));
+}
+---
+
+{hasData ? (
+  <div class="chart-card card">
+    <svg
+      class="price-chart"
+      viewBox={`0 0 ${width} ${height}`}
+      role="img"
+      aria-label="Price history chart in CAD"
+    >
+      <line
+        x1={padL}
+        y1={height - padB}
+        x2={width - padR}
+        y2={height - padB}
+        class="axis"
+      />
+      <line x1={padL} y1={padT} x2={padL} y2={height - padB} class="axis" />
+      {yLabels.map((l) => (
+        <g>
+          <line x1={padL} y1={l.y} x2={width - padR} y2={l.y} class="grid" />
+          <text x={padL - 8} y={l.y + 4} class="axis-label" text-anchor="end">
+            {l.text}
+          </text>
+        </g>
+      ))}
+      {xLabels.map((l) => (
+        <text x={l.x} y={height - 12} class="axis-label" text-anchor="middle">
+          {l.text}
+        </text>
+      ))}
+      {paths.map((p) => (
+        <path
+          d={p.d}
+          fill="none"
+          stroke={p.color}
+          stroke-width="2.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+      ))}
+    </svg>
+    <ul class="chart-legend">
+      {paths.map((p) => (
+        <li>
+          <span class="dot" style={`background:${p.color}`} />
+          {p.label}
+        </li>
+      ))}
+    </ul>
+  </div>
+) : (
+  <p class="chart-empty">No price history in placeholder data yet.</p>
+)}
+
+<style>
+  .chart-card {
+    padding-bottom: 0.75rem;
+  }
+
+  .price-chart {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  .axis {
+    stroke: var(--border);
+    stroke-width: 1.25;
+  }
+
+  .grid {
+    stroke: var(--border);
+    stroke-width: 0.5;
+    opacity: 0.45;
+  }
+
+  .axis-label {
+    fill: var(--muted);
+    font-size: 11px;
+    font-family: inherit;
+  }
+
+  .chart-legend {
+    list-style: none;
+    padding: 0.5rem 0 0;
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1rem;
+    font-size: 0.8rem;
+    color: var(--muted);
+  }
+
+  .chart-legend li {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+  }
+
+  .dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+  }
+
+  .chart-empty {
+    color: var(--muted);
+    font-size: 0.9rem;
+  }
+</style>

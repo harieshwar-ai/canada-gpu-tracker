@@ -1,0 +1,85 @@
+---
+import Layout from "../../../layouts/Layout.astro";
+import PlaceholderBanner from "../../../components/PlaceholderBanner.astro";
+import MsrpBar from "../../../components/ui/MsrpBar.astro";
+import { getAllGpus, getLaunchPriceGrid } from "../../../lib/store";
+import { formatCad } from "../../../lib/format";
+import { gpuUrl } from "../../../lib/routes";
+
+export const seriesHubKeys = ["geforce-50", "geforce-40", "rtx-pro"] as const;
+
+const hubs: Record<
+  (typeof seriesHubKeys)[number],
+  {
+    title: string;
+    description: string;
+    filter: (series: string, line?: string) => boolean;
+  }
+> = {
+  "geforce-50": {
+    title: "GeForce RTX 50 series",
+    description: "RTX 50-series prices and in-store stock across Canada (CAD).",
+    filter: (s: string) => s === "50-series",
+  },
+  "geforce-40": {
+    title: "GeForce RTX 40 series",
+    description: "RTX 40-series prices and stock in Canadian retailers.",
+    filter: (s: string) => s === "40-series",
+  },
+  "rtx-pro": {
+    title: "RTX PRO workstation",
+    description: "NVIDIA RTX PRO workstation GPUs tracked in Canada.",
+    filter: (_s: string, line?: string) => line === "pro",
+  },
+};
+
+export function getStaticPaths() {
+  return seriesHubKeys.map((series) => ({ params: { series } }));
+}
+
+const { series } = Astro.params;
+const hub = hubs[series as (typeof seriesHubKeys)[number]];
+if (!hub) return Astro.redirect("/404");
+
+const grid = getLaunchPriceGrid();
+const gpus = getAllGpus().filter((g) =>
+  series === "rtx-pro" ? g.productLine === "pro" : hub.filter(g.series)
+);
+---
+
+<Layout title={`${hub.title} — Canada GPU Tracker`} description={hub.description}>
+  <PlaceholderBanner />
+  <main id="main" class="page-wrap">
+    <nav class="breadcrumbs muted small">
+      <a href="/">Home</a> · <a href="/gpus/">GPUs</a> · {hub.title}
+    </nav>
+    <h1>{hub.title}</h1>
+    <p class="muted">{gpus.length} GPUs tracked (placeholder data)</p>
+    <div class="gpu-grid">
+      {gpus.map((gpu) => {
+        const tile = grid.find((r) => r.gpu.id === gpu.id);
+        const pct = tile?.pctOverMsrp ?? null;
+        return (
+          <a href={gpuUrl(gpu.slug)} class="gpu-tile card">
+            <h3>{gpu.modelName.replace("GeForce ", "")}</h3>
+            <p class="muted small">
+              {gpu.vramGb}GB · MSRP {formatCad(gpu.launchMsrpCad)}
+            </p>
+            {tile?.cheapestInStock != null && (
+              <p class="price">From {formatCad(tile.cheapestInStock)}</p>
+            )}
+            {pct != null && (
+              <p class={`pct ${pct <= 0 ? "good" : ""}`}>
+                {pct > 0 ? `+${pct}%` : `${pct}%`} vs MSRP
+              </p>
+            )}
+            <MsrpBar pct={pct} />
+            <p class="foot">
+              {tile ? `${tile.cardsInStock}/${tile.cardsTotal} cards in stock` : "—"}
+            </p>
+          </a>
+        );
+      })}
+    </div>
+  </main>
+</Layout>

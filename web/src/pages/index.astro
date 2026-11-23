@@ -1,0 +1,39 @@
+---
+import Layout from "../layouts/Layout.astro";
+import PlaceholderBanner from "../components/PlaceholderBanner.astro";
+import HeroStats from "../components/HeroStats.astro";
+import LiveChanges from "../components/LiveChanges.astro";
+import LaunchGrid from "../components/LaunchGrid.astro";
+import CheapestGrid from "../components/CheapestGrid.astro";
+import FreshFinds from "../components/FreshFinds.astro";
+import AlertsTeaser from "../components/AlertsTeaser.astro";
+import ProSection from "../components/ProSection.astro";
+import FAQ from "../components/FAQ.astro";
+import { getStore } from "../lib/store";
+
+const pageTitle =
+  "Canada GPU Tracker: NVIDIA GPU prices in CAD across Canadian retailers";
+const pageDescription =
+  "Live-style CAD price tracking, shelf stock by Canadian city, MSRP comparison, open-box finds, alerts, and history for GeForce and RTX PRO — placeholder data during development.";
+---
+
+<Layout title={pageTitle} description={pageDescription}>
+  <main id="main" class="page-wrap">
+    <PlaceholderBanner />
+    <div class="hero-split">
+      <HeroStats />
+      <LiveChanges />
+    </div>
+    <div class="retailer-strip" aria-label="Retailers">
+      {getStore().retailers.map((r) => (
+        <a class="retailer-pill" href={`/cards/?sold_at=${r.slug}`}>{r.name}</a>
+      ))}
+    </div>
+    <LaunchGrid />
+    <CheapestGrid />
+    <FreshFinds />
+    <AlertsTeaser />
+    <ProSection />
+    <FAQ />
+  </main>
+</Layout>

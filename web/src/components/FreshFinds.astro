@@ -1,0 +1,84 @@
+---
+import { getFreshFinds, getBrandCounts } from "../lib/store";
+import { formatCad } from "../lib/format";
+import type { FreshTab } from "../lib/store";
+
+const tabs: { id: FreshTab; label: string }[] = [
+  { id: "week", label: "This week" },
+  { id: "drops", label: "All price drops" },
+  { id: "open_box", label: "Open box" },
+  { id: "by_city", label: "In stock by city" },
+];
+
+const byTab = Object.fromEntries(
+  tabs.map((t) => [t.id, getFreshFinds(t.id)])
+) as Record<FreshTab, ReturnType<typeof getFreshFinds>>;
+
+const brands = getBrandCounts();
+---
+
+<section class="section" id="fresh-finds">
+  <h2 class="section-h">Fresh finds</h2>
+  <div class="tabs" role="tablist">
+    {tabs.map((t, i) => (
+      <button
+        type="button"
+        role="tab"
+        class:list={["tab", i === 0 && "active"]}
+        data-tab={t.id}
+        aria-selected={i === 0}
+      >
+        {t.label}
+      </button>
+    ))}
+  </div>
+  {tabs.map((t, i) => (
+    <ul class="fresh-list" data-panel={t.id} hidden={i !== 0}>
+      {byTab[t.id].length === 0 && <li class="muted">No placeholder matches.</li>}
+      {byTab[t.id].map((f) => (
+        <li class="fresh-item">
+          <a href={`/card/${f.card.slug}/`} class="fresh-title">
+            {f.card.brand} {f.card.modelName}
+          </a>
+          <span class="fresh-meta">
+            {f.gpu.modelName.replace("GeForce ", "")} · {f.retailer.name}
+            {f.city ? ` · ${f.city}` : ""}
+            {f.condition === "open_box" ? " · Open box" : ""}
+          </span>
+          <span class="fresh-price">
+            {f.previousPriceCad != null && (
+              <span class="was">was {formatCad(f.previousPriceCad)}</span>
+            )}
+            {formatCad(f.priceCad)}
+            {f.pctChange != null && <span class="drop">{f.pctChange}%</span>}
+          </span>
+        </li>
+      ))}
+    </ul>
+  ))}
+  <p class="brand-counts">
+    {brands.map((b) => (
+      <span>{b.brand} {b.count}</span>
+    ))}
+  </p>
+</section>
+
+<script>
+  const tabs = document.querySelectorAll<HTMLButtonElement>("#fresh-finds .tab");
+  const panels = document.querySelectorAll<HTMLUListElement>("#fresh-finds .fresh-list");
+  tabs.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const id = btn.dataset.tab;
+      tabs.forEach((t) => {
+        const on = t === btn;
+        t.classList.toggle("active", on);
+        t.setAttribute("aria-selected", String(on));
+      });
+      panels.forEach((p) => {
+        const on = p.dataset.panel === id;
+        if (on) p.removeAttribute("hidden");
+        else p.setAttribute("hidden", "");
+      });
+    });
+  });
+</script>

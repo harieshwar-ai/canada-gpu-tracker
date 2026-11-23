@@ -1,0 +1,227 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import PlaceholderBanner from "../../components/PlaceholderBanner.astro";
+import Sparkline from "../../components/ui/Sparkline.astro";
+import { buildCardRows, filterCardRows, sortCardRows } from "../../lib/catalog";
+import {
+  getAllGpus,
+  getGpuBySlug,
+  getLaunchPriceGrid,
+  getStore,
+  getStoreMap,
+  getRetailerMap,
+} from "../../lib/store";
+import { formatCad } from "../../lib/format";
+import { fromPublicGpuSlug, cardUrl, toPublicGpuSlug } from "../../lib/routes";
+
+export function getStaticPaths() {
+  return getAllGpus().map((gpu) => ({
+    params: { slug: toPublicGpuSlug(gpu.slug) },
+  }));
+}
+
+const { slug } = Astro.params;
+const internal = fromPublicGpuSlug(slug!);
+const gpu = getGpuBySlug(internal);
+if (!gpu) return Astro.redirect("/404");
+
+const grid = getLaunchPriceGrid().find((r) => r.gpu.id === gpu.id);
+let rows = sortCardRows(
+  filterCardRows(buildCardRows(), {}).filter((r) => r.gpu.id === gpu.id),
+  "price"
+);
+const brands = [...new Set(rows.map((r) => r.card.brand))].sort();
+const storeIndex = getStore();
+const storeMap = getStoreMap();
+const retailerMap = getRetailerMap();
+const shelfRows = storeIndex.offers
+  .filter((o) => o.gpuId === gpu.id && o.isPlaceholder !== true)
+  .flatMap((o) => {
+    const obs = storeIndex.priceObservations
+      .filter((x) => x.offerId === o.id)
+      .sort((a, b) => b.observedAt.localeCompare(a.observedAt))[0];
+    if (!obs?.inStock) return [];
+    const st = o.storeId ? storeMap.get(o.storeId) : undefined;
+    const ret = retailerMap.get(o.retailerId);
+    if (!st || !ret) return [];
+    return [{ store: st, retailer: ret, price: obs.priceCad }];
+  })
+  .slice(0, 12);
+
+const pageTitle = `${gpu.modelName} price & stock (CAD)`;
+const pageDescription = `Track ${gpu.modelName} prices, in-stock cards, and store shelf stock across Canada. Placeholder data.`;
+---
+
+<Layout title={pageTitle} description={pageDescription} ogType="article">
+  <main id="main" class="page-wrap">
+    <PlaceholderBanner />
+    <nav class="breadcrumbs muted small">
+      <a href="/">Home</a> · <a href="/gpus/">GPUs</a> · {gpu.modelName}
+    </nav>
+    <header class="gpu-page-head">
+      <p class="eyebrow">{gpu.series} · {gpu.chip}</p>
+      <h1>{gpu.modelName} price &amp; stock</h1>
+      <p class="spec-inline muted">
+        {gpu.vramGb}GB · Launch MSRP {formatCad(gpu.launchMsrpCad)}
+      </p>
+      <dl class="stat-row">
+        <div class="stat-tile"><dd>{formatCad(gpu.launchMsrpCad)}</dd><dt>MSRP</dt></div>
+        <div class="stat-tile"><dd>{grid?.cheapestInStock != null ? formatCad(grid.cheapestInStock) : "—"}</dd><dt>Lowest</dt></div>
+        <div class="stat-tile"><dd>{grid ? `${grid.cardsInStock}/${grid.cardsTotal}` : "—"}</dd><dt>In stock</dt></div>
+        <div class="stat-tile"><dd>{grid?.storesInStock ?? "—"}</dd><dt>Stores</dt></div>
+      </dl>
+    </header>
+
+    <div class="gpu-layout">
+      <aside class="filters panel" aria-label="Filters">
+        <h2 class="small">Filters</h2>
+        <label class="filter-check"><input type="checkbox" id="filter-instock" checked /> In stock only</label>
+        <fieldset>
+          <legend class="small">Brand</legend>
+          {brands.map((b) => (
+            <label class="filter-check">
+              <input type="checkbox" class="brand-filter" value={b} checked /> {b}
+            </label>
+          ))}
+        </fieldset>
+      </aside>
+      <div class="gpu-main">
+    <div class="toolbar card">
+      <label>Sort
+        <select id="sort-cards">
+          <option value="price">Lowest price</option>
+          <option value="msrp">Closest to MSRP</option>
+          <option value="price_per_gb">Best $/GB VRAM</option>
+          <option value="name">Name</option>
+        </select>
+      </label>
+    </div>
+
+    <div class="table-wrap panel" id="gpu-cards-table">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Card</th>
+            <th>Specs</th>
+            <th>Lowest</th>
+            <th>% MSRP</th>
+            <th>$/GB</th>
+            <th>Trend</th>
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((row) => (
+            <tr
+              data-brand={row.card.brand}
+              data-instock={row.inStock ? "1" : "0"}
+              data-sort-price={row.lowest ?? ""}
+              data-sort-msrp={row.pctMsrp ?? ""}
+              data-sort-pgb={row.pricePerGb ?? ""}
+              data-sort-name={row.card.modelName}
+            >
+              <td><a href={cardUrl(row.card.slug)}>{row.card.brand} {row.card.modelName}</a></td>
+              <td class="mono small">{row.card.lengthMm}mm · {row.card.slotWidth}s · {row.card.powerConnector}</td>
+              <td>{row.lowest != null ? formatCad(row.lowest) : "—"}</td>
+              <td>{row.pctMsrp != null ? `${row.pctMsrp > 0 ? "+" : ""}${row.pctMsrp}%` : "—"}</td>
+              <td>{row.pricePerGb != null ? formatCad(row.pricePerGb) : "—"}</td>
+              <td><Sparkline prices={row.sparkline} /></td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+    {shelfRows.length > 0 && (
+      <section class="shelf-section panel">
+        <h2 class="section-h">In stock at stores (sample)</h2>
+        <ul class="shelf-list">
+          {shelfRows.map((s) => (
+            <li>
+              <a href={`/stores/${s.store.slug}/`}>{s.store.name}</a>
+              <span class="muted small"> · {s.store.city}, {s.store.provinceCode} · {s.retailer.name} · {formatCad(s.price)}</span>
+            </li>
+          ))}
+        </ul>
+      </section>
+    )}
+      </div>
+    </div>
+  </main>
+  <script>
+    const instock = document.getElementById("filter-instock") as HTMLInputElement;
+    const brandBoxes = [...document.querySelectorAll<HTMLInputElement>(".brand-filter")];
+    const tbody = document.querySelector("#gpu-cards-table tbody")!;
+    function applyFilters() {
+      const brandsOn = new Set(brandBoxes.filter((b) => b.checked).map((b) => b.value));
+      const onlyStock = instock?.checked ?? false;
+      for (const row of tbody.querySelectorAll("tr")) {
+        const el = row as HTMLElement;
+        const brandOk = brandsOn.has(el.dataset.brand || "");
+        const stockOk = !onlyStock || el.dataset.instock === "1";
+        el.hidden = !(brandOk && stockOk);
+      }
+    }
+    instock?.addEventListener("change", applyFilters);
+    brandBoxes.forEach((b) => b.addEventListener("change", applyFilters));
+    applyFilters();
+
+    const sel = document.getElementById("sort-cards") as HTMLSelectElement;
+    sel?.addEventListener("change", () => {
+      const rows = [...tbody.querySelectorAll("tr")];
+      const key = sel.value;
+      const attr = key === "name" ? "sortName" : key === "msrp" ? "sortMsrp" : key === "price_per_gb" ? "sortPgb" : "sortPrice";
+      const datasetKey = attr.replace(/[A-Z]/g, (m) => "-" + m.toLowerCase()).replace("sort-", "sort-");
+      const map: Record<string, string> = { price: "sortPrice", msrp: "sortMsrp", price_per_gb: "sortPgb", name: "sortName" };
+      const dk = `data-${map[key].replace(/([A-Z])/g, "-$1").toLowerCase()}`;
+      rows.sort((a, b) => {
+        const av = (a as HTMLElement).getAttribute(dk) || "";
+        const bv = (b as HTMLElement).getAttribute(dk) || "";
+        if (key === "name") return av.localeCompare(bv);
+        return Number(av || 1e9) - Number(bv || 1e9);
+      });
+      rows.forEach((r) => tbody.appendChild(r));
+    });
+  </script>
+</Layout>
+
+<style>
+  .breadcrumbs a { color: var(--muted); }
+  .gpu-page-head { margin-bottom: 1rem; }
+  .eyebrow { font-size: 0.8rem; color: var(--muted); margin: 0 0 0.25rem; }
+  .spec-inline { margin: 0 0 0.75rem; }
+  .toolbar { margin-bottom: 0.75rem; display: flex; gap: 1rem; }
+  .mono { font-family: var(--mono); }
+  .gpu-layout {
+    display: grid;
+    gap: 1rem;
+  }
+  @media (min-width: 960px) {
+    .gpu-layout {
+      grid-template-columns: 220px 1fr;
+      align-items: start;
+    }
+  }
+  .filters h2 {
+    margin: 0 0 0.5rem;
+    font-size: 0.85rem;
+  }
+  .filters fieldset {
+    border: none;
+    margin: 0.75rem 0 0;
+    padding: 0;
+  }
+  .filter-check {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.82rem;
+    margin: 0.25rem 0;
+  }
+  .shelf-section { margin-top: 1rem; }
+  .shelf-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    font-size: 0.85rem;
+  }
+  .shelf-list li { padding: 0.35rem 0; border-bottom: 1px solid var(--border); }
+</style>

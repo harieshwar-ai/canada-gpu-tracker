@@ -1,0 +1,30 @@
+---
+import { getProGpus, getAllCards, getOffersForCard } from "../lib/store";
+import { formatCad } from "../lib/format";
+
+const proGpus = getProGpus();
+---
+
+<section class="section">
+  <h2 class="section-h">RTX PRO / workstation</h2>
+  <div class="pro-grid">
+    {proGpus.map((gpu) => {
+      const cards = getAllCards().filter((c) => c.gpuId === gpu.id);
+      const cheapest = cards
+        .flatMap((c) => getOffersForCard(c.id))
+        .filter((o) => o.offer.isPlaceholder !== true && o.latest?.inStock)
+        .sort((a, b) => (a.latest!.priceCad) - (b.latest!.priceCad))[0];
+      return (
+        <a href={`/gpu/${gpu.slug}/`} class="card pro-card">
+          <h3>{gpu.modelName}</h3>
+          <p>{gpu.vramGb} GB · MSRP {formatCad(gpu.launchMsrpCad)}</p>
+          {cheapest?.latest && (
+            <p class="launch-cad">
+              from {formatCad(cheapest.latest.priceCad)} · {cheapest.retailer.name}
+            </p>
+          )}
+        </a>
+      );
+    })}
+  </div>
+</section>

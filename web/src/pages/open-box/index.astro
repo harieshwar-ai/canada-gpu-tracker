@@ -1,0 +1,19 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import PlaceholderBanner from "../../components/PlaceholderBanner.astro";
+import { getFreshFinds } from "../../lib/store";
+import { cardUrl } from "../../lib/routes";
+const items = getFreshFinds("open_box");
+---
+
+<Layout title="Open box — Canada GPU Tracker" description="Open-box GPU offers in Canada (placeholder).">
+  <main id="main" class="page-wrap">
+    <PlaceholderBanner />
+    <h1>Open box</h1>
+    <ul class="fresh-list panel" style="padding:0.75rem">
+      {items.map((f) => (
+        <li><a href={cardUrl(f.card.slug)}>{f.card.brand} {f.card.modelName}</a> — {f.retailer.name} {f.city && `· ${f.city}`}</li>
+      ))}
+    </ul>
+  </main>
+</Layout>
