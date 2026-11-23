@@ -1,0 +1,123 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import PlaceholderBanner from "../../components/PlaceholderBanner.astro";
+import Sparkline from "../../components/ui/Sparkline.astro";
+import { buildCardRows } from "../../lib/catalog";
+import { formatCad } from "../../lib/format";
+import { cardUrl } from "../../lib/routes";
+
+const rows = buildCardRows();
+const pageTitle = "All NVIDIA graphics cards — Canada";
+const pageDescription = "Browse all tracked graphics cards with CAD prices, stock, MSRP %, and sparklines.";
+---
+
+<Layout title={pageTitle} description={pageDescription}>
+  <main id="main" class="page-wrap">
+    <PlaceholderBanner />
+    <h1>All graphics cards</h1>
+    <p class="muted">{rows.length} cards (placeholder)</p>
+    <div class="toolbar card">
+      <label>Search <input type="search" id="q" placeholder="Brand or model" /></label>
+      <label><input type="checkbox" id="instock" /> In stock only</label>
+      <label>Sort
+        <select id="sort">
+          <option value="price">Lowest price</option>
+          <option value="msrp">Closest to MSRP</option>
+          <option value="price_per_gb">Best $/GB</option>
+          <option value="name">Name</option>
+        </select>
+      </label>
+    </div>
+    <p id="cards-empty" class="empty-state card" hidden>
+      No cards match your filters.
+      <button type="button" class="btn-ghost" id="clear-filters">Clear filters</button>
+    </p>
+    <div class="table-wrap panel">
+      <table class="data-table" id="cards-table">
+        <thead>
+          <tr>
+            <th>Card</th>
+            <th>GPU</th>
+            <th>Price</th>
+            <th>% MSRP</th>
+            <th>$/GB</th>
+            <th>Trend</th>
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((row) => (
+            <tr
+              data-q={`${row.card.brand} ${row.card.modelName} ${row.gpu.modelName}`.toLowerCase()}
+              data-instock={row.inStock ? "1" : "0"}
+              data-price={row.lowest ?? 999999}
+              data-msrp={row.pctMsrp ?? 9999}
+              data-pgb={row.pricePerGb ?? 999999}
+              data-name={row.card.modelName}
+            >
+              <td><a href={cardUrl(row.card.slug)}>{row.card.brand} {row.card.modelName}</a></td>
+              <td class="muted small">{row.gpu.modelName.replace("GeForce ", "")}</td>
+              <td>{row.lowest != null ? formatCad(row.lowest) : "—"}</td>
+              <td>{row.pctMsrp != null ? `${row.pctMsrp}%` : "—"}</td>
+              <td>{row.pricePerGb != null ? formatCad(row.pricePerGb) : "—"}</td>
+              <td><Sparkline prices={row.sparkline} /></td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  </main>
+  <script>
+    const q = document.getElementById("q") as HTMLInputElement;
+    const instock = document.getElementById("instock") as HTMLInputElement;
+    const sort = document.getElementById("sort") as HTMLSelectElement;
+    const tbody = document.querySelector("#cards-table tbody")!;
+    const empty = document.getElementById("cards-empty");
+  const clear = document.getElementById("clear-filters");
+    function apply() {
+      const query = q?.value.toLowerCase() ?? "";
+      const only = instock?.checked;
+      let visible = 0;
+      for (const row of tbody.querySelectorAll("tr")) {
+        const el = row as HTMLElement;
+        const matchQ = !query || (el.dataset.q ?? "").includes(query);
+        const matchS = !only || el.dataset.instock === "1";
+        const show = matchQ && matchS;
+        el.hidden = !show;
+        if (show) visible++;
+      }
+      if (empty) empty.hidden = visible > 0;
+      const rows = [...tbody.querySelectorAll("tr:not([hidden])")];
+      const key = sort?.value ?? "price";
+      const attr = key === "name" ? "name" : key === "msrp" ? "msrp" : key === "price_per_gb" ? "pgb" : "price";
+      rows.sort((a, b) => {
+        if (key === "name") return (a as HTMLElement).dataset.name!.localeCompare((b as HTMLElement).dataset.name!);
+        return Number((a as HTMLElement).dataset[attr]) - Number((b as HTMLElement).dataset[attr]);
+      });
+      rows.forEach((r) => tbody.appendChild(r));
+    }
+    [q, instock, sort].forEach((el) => el?.addEventListener("input", apply));
+    apply();
+    const params = new URLSearchParams(location.search);
+    if (params.get("avail") === "stock") instock.checked = true;
+    if (params.get("q")) q.value = params.get("q")!;
+    apply();
+    clear?.addEventListener("click", () => {
+      q.value = "";
+      instock.checked = false;
+      apply();
+    });
+  </script>
+</Layout>
+
+<style>
+  .toolbar { display: flex; flex-wrap: wrap; gap: 1rem; margin: 1rem 0; align-items: end; }
+  .toolbar input, .toolbar select { margin-left: 0.35rem; padding: 0.35rem; background: var(--bg); border: 1px solid var(--border); color: var(--text); border-radius: 6px; }
+  .empty-state {
+    margin: 1rem 0;
+    padding: 1rem;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.65rem;
+  }
+</style>

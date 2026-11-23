@@ -9,6 +9,7 @@ import FreshFinds from "../components/FreshFinds.astro";
 import AlertsTeaser from "../components/AlertsTeaser.astro";
 import ProSection from "../components/ProSection.astro";
 import FAQ from "../components/FAQ.astro";
+import { getStore } from "../lib/store";
 
 const pageTitle =
   "Canada GPU Tracker: NVIDIA GPU prices in CAD across Canadian retailers";
@@ -17,10 +18,17 @@ const pageDescription =
 ---
 
 <Layout title={pageTitle} description={pageDescription}>
-  <PlaceholderBanner />
-  <main class="main">
-    <HeroStats />
-    <LiveChanges />
+  <main id="main" class="page-wrap">
+    <PlaceholderBanner />
+    <div class="hero-split">
+      <HeroStats />
+      <LiveChanges />
+    </div>
+    <div class="retailer-strip" aria-label="Retailers">
+      {getStore().retailers.map((r) => (
+        <a class="retailer-pill" href={`/cards/?sold_at=${r.slug}`}>{r.name}</a>
+      ))}
+    </div>
     <LaunchGrid />
     <CheapestGrid />
     <FreshFinds />

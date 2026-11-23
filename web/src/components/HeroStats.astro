@@ -1,31 +1,41 @@
 ---
-import { getSiteStats } from "../lib/store";
+import { getSiteStats, getStore } from "../lib/store";
+import { timeAgo } from "../lib/time";
 
 const stats = getSiteStats();
+const updated = getStore().generatedAt;
 ---
 
 <section class="hero">
-  <h1>NVIDIA RTX prices &amp; shelf stock in Canada</h1>
+  <p class="live-pill">
+    Live · updated <strong>{timeAgo(updated)}</strong>
+  </p>
+  <h1 class="hero-title">NVIDIA RTX prices &amp; in-store stock in Canada.</h1>
   <p class="hero-lead">
     Shelf stock at Canada Computers, Memory Express and Best Buy stores, alongside Newegg.ca,
-    Amazon.ca, Walmart.ca and more — compared to NVIDIA Canada launch MSRP in CAD.
+    Amazon.ca, Walmart.ca and more — against NVIDIA Canada launch MSRP in CAD.
   </p>
-  <dl class="stat-grid">
-    <div>
-      <dt>Cards tracked</dt>
-      <dd>{stats.cardsTracked.toLocaleString("en-CA")}</dd>
+  <div class="hero-ctas">
+    <a href="/cards/?avail=stock" class="btn-primary">In stock now</a>
+    <a href="/cards/" class="btn-secondary">Browse all cards</a>
+    <a href="/finder/" class="btn-secondary">Finder</a>
+  </div>
+  <dl class="stat-row">
+    <div class="stat-tile">
+      <dd>{stats.cardsTracked}</dd>
+      <dt>cards tracked</dt>
     </div>
-    <div>
-      <dt>Stores</dt>
-      <dd>{stats.stores.toLocaleString("en-CA")}</dd>
+    <div class="stat-tile">
+      <dd>{stats.stores}</dd>
+      <dt>stores</dt>
     </div>
-    <div>
-      <dt>Offers in stock</dt>
-      <dd>{stats.offersInStock.toLocaleString("en-CA")}</dd>
+    <div class="stat-tile">
+      <dd>{stats.offersInStock}</dd>
+      <dt>offers in stock</dt>
     </div>
-    <div>
-      <dt>Retailers</dt>
-      <dd>{stats.retailers.toLocaleString("en-CA")}</dd>
+    <div class="stat-tile">
+      <dd>{stats.retailers}</dd>
+      <dt>retailers</dt>
     </div>
   </dl>
 </section>

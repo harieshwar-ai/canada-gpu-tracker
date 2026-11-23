@@ -4,6 +4,8 @@ Canada-first NVIDIA GPU price tracker (feature parity target: [rtx.live](https:/
 
 **Source of truth:** Supabase Postgres (`blfiydxlbfuusmcwbgvu`, `ca-central-1`). The static site snapshots public RLS reads at build time; uncleared retailers stay placeholder rows until policies allow live ingesters.
 
+**UX spec:** [`docs/rtx-live-spec.md`](docs/rtx-live-spec.md) (numbered checklists per section) · **Phase 2 status:** [`docs/rtx-live-spec-impl-status.md`](docs/rtx-live-spec-impl-status.md) · **rtx vs ours screenshots:** [`docs/compare/`](docs/compare/) · internal rtx reference: [`docs/reference/rtx-live/`](docs/reference/rtx-live/).
+
 ## Quick start
 
 ```bash
@@ -73,3 +75,5 @@ Uncleared retailers (Best Buy, Newegg, etc.) are **seed placeholder listings** o
 Historical SQL: `db/migrations/001_init.sql`, `002_extended.sql`  
 TypeScript: `types/db.ts`  
 Canonical deploy: `supabase/migrations/*`
+
+Static Astro site aligned to the spec: `/`, `/gpus/*`, `/cards/*`, deals/discovery routes, stores, preferences, and `/alerts/`. Legacy `/gpu/*` and `/card/*` redirect to new paths. Build syncs from Supabase via `scripts/sync-store-from-supabase.ts` (see `vercel.json` for deploy env).
