@@ -9,27 +9,7 @@ import {
   extractBrand,
   matchGpuFromText,
 } from "../match/gpu";
-
-const CC_STORE_MAP: Record<
-  string,
-  { storeKey: string; city: string; provinceCode: string }
-> = {
-  markham: { storeKey: "cc-markham", city: "Markham", provinceCode: "ON" },
-  vancouver: { storeKey: "cc-vancouver", city: "Vancouver", provinceCode: "BC" },
-  etobicoke: { storeKey: "cc-etobicoke", city: "Etobicoke", provinceCode: "ON" },
-  "toronto downtown": {
-    storeKey: "cc-toronto-dt",
-    city: "Toronto",
-    provinceCode: "ON",
-  },
-  "north york lawrence": {
-    storeKey: "cc-north-york",
-    city: "North York",
-    provinceCode: "ON",
-  },
-  calgary: { storeKey: "cc-calgary", city: "Calgary", provinceCode: "AB" },
-  edmonton: { storeKey: "cc-edmonton", city: "Edmonton", provinceCode: "AB" },
-};
+import { lookupCanadaComputersStore } from "./cc-store-map";
 
 function extractJsonLdProduct(html: string): Record<string, unknown> | null {
   const re =
@@ -52,12 +32,14 @@ function parseStoreStock(html: string): ParsedStoreStock[] {
     /<span class="col-3[^"]*"[^>]*>\s*([^<]+?)\s*<\/span>[\s\S]*?shop-online-box[^>]*>\s*(\d+)\s*<\/span>/gi;
   let m: RegExpExecArray | null;
   while ((m = blockRe.exec(html))) {
-    const label = m[1]!.trim().toLowerCase();
+    const label = m[1]!.trim();
     const qty = Number.parseInt(m[2]!, 10);
-    const mapped = CC_STORE_MAP[label];
+    const mapped = lookupCanadaComputersStore(label);
     if (!mapped) continue;
     stocks.push({
-      ...mapped,
+      storeKey: mapped.slug,
+      city: mapped.city,
+      provinceCode: mapped.provinceCode,
       quantity: Number.isFinite(qty) ? qty : 0,
     });
   }
@@ -113,7 +95,7 @@ export function parseCanadaComputersProduct(
     url.match(/\/(\d+)\/[^/]+\.html/)?.[1] ??
     "unknown";
 
-  const openBox = detectOpenBox(title + html, url);
+  const openBox = detectOpenBox(title, url);
   const condition = openBox ? "open_box" : "new";
 
   const storeStock = parseStoreStock(html);

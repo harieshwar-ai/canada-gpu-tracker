@@ -18,7 +18,7 @@ SELECT cron.schedule(
   'ingest-gpus-every-6h',
   '0 */6 * * *',
   $$
-  SELECT extensions.net.http_post(
+  SELECT net.http_post(
     url := 'https://blfiydxlbfuusmcwbgvu.supabase.co/functions/v1/ingest',
     headers := jsonb_build_object(
       'Content-Type', 'application/json',
@@ -39,7 +39,7 @@ SELECT cron.schedule(
   'ingest-stock-every-2h',
   '0 */2 * * *',
   $$
-  SELECT extensions.net.http_post(
+  SELECT net.http_post(
     url := 'https://blfiydxlbfuusmcwbgvu.supabase.co/functions/v1/ingest',
     headers := jsonb_build_object(
       'Content-Type', 'application/json',

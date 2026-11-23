@@ -26,8 +26,11 @@ Project URL: `https://blfiydxlbfuusmcwbgvu.supabase.co`
 | 3 | `20260123100002_rls.sql` | Public read-only + `create_price_alert` RPC |
 | 4 | `20260123100003_seed.sql` | GPU/card catalog, retailers (`is_cleared`), placeholder offers |
 | 5 | `20260123100004_vault_cron.sql` | Vault ingest secret + cron → `ingest` function |
+| 6 | `20260123100005_ingest_secret_rpc.sql` | `verify_ingest_secret` RPC (vault-backed when env unset) |
+| 7 | `20260123100006_views_security_invoker.sql` | Invoker views for anon reads |
+| 8 | `20260123100007_cc_stores_seed.sql` | Canada Computers store catalog (~42 locations) |
 
-After migration 5: read vault secret `ingest_cron_secret` and set Edge Function env **`INGEST_CRON_SECRET`** to the same value (not stored in git).
+Optionally, after migration 5: read vault secret `ingest_cron_secret` and set Edge Function env **`INGEST_CRON_SECRET`** to the same value (not stored in git). If unset, `ingest` verifies `x-ingest-secret` via `verify_ingest_secret`.
 
 ### 2. Edge Functions
 

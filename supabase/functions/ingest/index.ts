@@ -252,13 +252,6 @@ Deno.serve(async (req) => {
   }
 
   const secret = req.headers.get("x-ingest-secret");
-  const expected = Deno.env.get("INGEST_CRON_SECRET");
-  if (!expected || secret !== expected) {
-    return new Response(JSON.stringify({ error: "unauthorized" }), {
-      status: 401,
-      headers: { ...cors, "Content-Type": "application/json" },
-    });
-  }
 
   const url = Deno.env.get("SUPABASE_URL");
   const key = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
@@ -270,6 +263,23 @@ Deno.serve(async (req) => {
   }
 
   const supabase = createClient(url, key, { auth: { persistSession: false } });
+
+  const expectedEnv = Deno.env.get("INGEST_CRON_SECRET");
+  let authorized = false;
+  if (expectedEnv) {
+    authorized = secret === expectedEnv;
+  } else if (secret) {
+    const { data, error } = await supabase.rpc("verify_ingest_secret", {
+      p_secret: secret,
+    });
+    authorized = !error && data === true;
+  }
+  if (!authorized) {
+    return new Response(JSON.stringify({ error: "unauthorized" }), {
+      status: 401,
+      headers: { ...cors, "Content-Type": "application/json" },
+    });
+  }
   const body = req.method === "POST" ? await req.json().catch(() => ({})) : {};
   const mode = body.mode === "stock" ? "stock" : "full";
   const maxPerRetailer =
@@ -338,6 +348,13 @@ Deno.serve(async (req) => {
         if (err instanceof CrawlStoppedError) {
           challenged = true;
           message = err.message;
+          break;
+        }
+        const timedOut =
+          err instanceof DOMException && err.name === "TimeoutError";
+        if (timedOut) {
+          challenged = true;
+          message = err instanceof Error ? err.message : "fetch timeout";
           break;
         }
         skipped++;

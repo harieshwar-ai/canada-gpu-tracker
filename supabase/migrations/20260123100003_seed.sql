@@ -77,19 +77,11 @@ ON CONFLICT DO NOTHING;
 INSERT INTO price_observations (listing_id, price_cad, in_stock, observed_at)
 VALUES ('00000000-0000-4000-a000-000000000500', 829.99, true, '2026-11-23T08:00:00.000Z');
 
-INSERT INTO listings (id, gpu_id, card_id, retailer_id, store_id, sku, product_url, brand, variant_label, condition, is_placeholder)
-VALUES ('00000000-0000-4000-a000-000000000501', '00000000-0000-4000-a000-000000000004', '00000000-0000-4000-a000-000000000206', '00000000-0000-4000-a000-000000000102', '00000000-0000-4000-a000-000000000304', 'EX-BB-5070-ZT', 'https://example.invalid/bb/5070', 'ZOTAC', 'Twin Edge OC', 'new', true)
-ON CONFLICT DO NOTHING;
+INSERT INTO price_observations (listing_id, price_cad, in_stock, observed_at)
+VALUES ('00000000-0000-4000-a000-000000000500', 849.99, true, '2026-11-10T18:00:00.000Z');
 
 INSERT INTO price_observations (listing_id, price_cad, in_stock, observed_at)
-VALUES ('00000000-0000-4000-a000-000000000501', 849.99, true, '2026-11-10T18:00:00.000Z');
-
-INSERT INTO listings (id, gpu_id, card_id, retailer_id, store_id, sku, product_url, brand, variant_label, condition, is_placeholder)
-VALUES ('00000000-0000-4000-a000-000000000502', '00000000-0000-4000-a000-000000000004', '00000000-0000-4000-a000-000000000206', '00000000-0000-4000-a000-000000000102', '00000000-0000-4000-a000-000000000304', 'EX-BB-5070-ZT', 'https://example.invalid/bb/5070', 'ZOTAC', 'Twin Edge OC', 'new', true)
-ON CONFLICT DO NOTHING;
-
-INSERT INTO price_observations (listing_id, price_cad, in_stock, observed_at)
-VALUES ('00000000-0000-4000-a000-000000000502', 839.99, false, '2026-11-15T18:00:00.000Z');
+VALUES ('00000000-0000-4000-a000-000000000500', 839.99, false, '2026-11-15T18:00:00.000Z');
 
 INSERT INTO listings (id, gpu_id, card_id, retailer_id, store_id, sku, product_url, brand, variant_label, condition, is_placeholder)
 VALUES ('00000000-0000-4000-a000-000000000503', '00000000-0000-4000-a000-000000000004', '00000000-0000-4000-a000-000000000207', '00000000-0000-4000-a000-000000000104', '00000000-0000-4000-a000-000000000302', 'EX-ME-5070-SLIM', 'https://example.invalid/me/5070', 'PNY', 'Slim OC Dual-Fan', 'new', true)
@@ -105,12 +97,8 @@ ON CONFLICT DO NOTHING;
 INSERT INTO price_observations (listing_id, price_cad, in_stock, observed_at)
 VALUES ('00000000-0000-4000-a000-000000000504', 1440, true, '2026-11-23T07:00:00.000Z');
 
-INSERT INTO listings (id, gpu_id, card_id, retailer_id, store_id, sku, product_url, brand, variant_label, condition, is_placeholder)
-VALUES ('00000000-0000-4000-a000-000000000505', '00000000-0000-4000-a000-000000000003', '00000000-0000-4000-a000-000000000204', '00000000-0000-4000-a000-000000000105', NULL, 'EX-NE-5070TI', 'https://example.invalid/ne/5070ti', 'PNY', 'XLR8 Gaming VERTO OC', 'new', true)
-ON CONFLICT DO NOTHING;
-
 INSERT INTO price_observations (listing_id, price_cad, in_stock, observed_at)
-VALUES ('00000000-0000-4000-a000-000000000505', 1461, true, '2026-11-20T12:00:00.000Z');
+VALUES ('00000000-0000-4000-a000-000000000504', 1461, true, '2026-11-20T12:00:00.000Z');
 
 INSERT INTO listings (id, gpu_id, card_id, retailer_id, store_id, sku, product_url, brand, variant_label, condition, is_placeholder)
 VALUES ('00000000-0000-4000-a000-000000000506', '00000000-0000-4000-a000-000000000002', '00000000-0000-4000-a000-000000000202', '00000000-0000-4000-a000-000000000106', NULL, 'EX-AMZ-5080', 'https://example.invalid/amz/5080', 'MSI', 'VENTUS 3X OC', 'new', true)

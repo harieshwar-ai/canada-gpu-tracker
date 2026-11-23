@@ -16,6 +16,7 @@ import {
 } from "../crawl/sku-budget";
 import type { ParsedProduct } from "../parsers/types";
 import { cardSlugForParsed, canadaComputersInternalUrl } from "../parsers/canada-computers";
+import { CANADA_COMPUTERS_STORES } from "../parsers/cc-store-map";
 import { buildCardSlug } from "../match/gpu";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -181,6 +182,21 @@ async function runRetailerSource(
           },
         };
       }
+      const timedOut =
+        err instanceof DOMException && err.name === "TimeoutError";
+      if (timedOut) {
+        await saveSkuFetchState(state);
+        return {
+          observations,
+          log: {
+            retailerId: def.id,
+            fetched,
+            skipped,
+            challenged: true,
+            message: err instanceof Error ? err.message : "fetch timeout",
+          },
+        };
+      }
       skipped++;
     }
   }
@@ -294,89 +310,17 @@ export async function runClearedRetailers(options: {
   return { observations: allObs, retailers, stores, logs };
 }
 
-export const CLEARED_CANADA_COMPUTERS_STORES: Store[] = [
-    {
-      id: "store-cc-markham",
-      retailerId: "ret-canada-computers",
-      slug: "cc-markham",
-      name: "Canada Computers Markham",
-      city: "Markham",
-      provinceCode: "ON",
-      countryCode: "CA",
-      latitude: 43.8563,
-      longitude: -79.337,
-      createdAt: T0,
-    },
-    {
-      id: "store-cc-vancouver",
-      retailerId: "ret-canada-computers",
-      slug: "cc-vancouver",
-      name: "Canada Computers Vancouver",
-      city: "Vancouver",
-      provinceCode: "BC",
-      countryCode: "CA",
-      latitude: 49.2634,
-      longitude: -123.137,
-      createdAt: T0,
-    },
-    {
-      id: "store-cc-etobicoke",
-      retailerId: "ret-canada-computers",
-      slug: "cc-etobicoke",
-      name: "Canada Computers Etobicoke",
-      city: "Etobicoke",
-      provinceCode: "ON",
-      countryCode: "CA",
-      latitude: 43.6205,
-      longitude: -79.5132,
-      createdAt: T0,
-    },
-    {
-      id: "store-cc-toronto-dt",
-      retailerId: "ret-canada-computers",
-      slug: "cc-toronto-dt",
-      name: "Canada Computers Toronto Downtown",
-      city: "Toronto",
-      provinceCode: "ON",
-      countryCode: "CA",
-      latitude: 43.6544,
-      longitude: -79.3807,
-      createdAt: T0,
-    },
-    {
-      id: "store-cc-north-york",
-      retailerId: "ret-canada-computers",
-      slug: "cc-north-york",
-      name: "Canada Computers North York Lawrence",
-      city: "North York",
-      provinceCode: "ON",
-      countryCode: "CA",
-      latitude: 43.7315,
-      longitude: -79.4189,
-      createdAt: T0,
-    },
-    {
-      id: "store-cc-calgary",
-      retailerId: "ret-canada-computers",
-      slug: "cc-calgary",
-      name: "Canada Computers Calgary",
-      city: "Calgary",
-      provinceCode: "AB",
-      countryCode: "CA",
-      latitude: 51.0447,
-      longitude: -114.0719,
-      createdAt: T0,
-    },
-    {
-      id: "store-cc-edmonton",
-      retailerId: "ret-canada-computers",
-      slug: "cc-edmonton",
-      name: "Canada Computers Edmonton",
-      city: "Edmonton",
-      provinceCode: "AB",
-      countryCode: "CA",
-      latitude: 53.5461,
-      longitude: -113.4938,
-      createdAt: T0,
-    },
-  ];
+export const CLEARED_CANADA_COMPUTERS_STORES: Store[] = CANADA_COMPUTERS_STORES.map(
+  (s) => ({
+    id: `store-${s.slug}`,
+    retailerId: "ret-canada-computers",
+    slug: s.slug,
+    name: s.name,
+    city: s.city,
+    provinceCode: s.provinceCode,
+    countryCode: s.countryCode,
+    latitude: s.latitude,
+    longitude: s.longitude,
+    createdAt: T0,
+  })
+);

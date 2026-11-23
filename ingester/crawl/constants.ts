@@ -6,3 +6,5 @@ export const MIN_HOST_INTERVAL_MS = 7_000;
 
 /** Per-SKU daily fetch cap (curated list; polite crawl budget). */
 export const MAX_SKU_FETCHES_PER_DAY = 4;
+
+export const FETCH_TIMEOUT_MS = 20_000;

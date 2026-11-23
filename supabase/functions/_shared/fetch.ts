@@ -1,4 +1,4 @@
-import { MIN_HOST_INTERVAL_MS, USER_AGENT } from "./constants.ts";
+import { FETCH_TIMEOUT_MS, MIN_HOST_INTERVAL_MS, USER_AGENT } from "./constants.ts";
 import { isBotChallenge } from "./challenge.ts";
 import { isPathAllowed, parseRobotsForBot, type RobotsRules } from "./robots.ts";
 import { waitForHost } from "./rate-limit.ts";
@@ -23,6 +23,7 @@ async function loadRobots(origin: string): Promise<RobotsRules> {
   const res = await fetch(robotsUrl, {
     headers: { "User-Agent": USER_AGENT, Accept: "text/plain,*/*" },
     redirect: "follow",
+    signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
   });
   const text = await res.text();
   if (isBotChallenge(text, res.status)) {
@@ -61,6 +62,7 @@ export async function politeFetch(url: string): Promise<PoliteFetchResult> {
         Accept: "text/html,application/xhtml+xml;q=0.9,*/*;q=0.8",
       },
       redirect: "follow",
+      signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
     });
     const html = await res.text();
     if (isBotChallenge(html, res.status)) {

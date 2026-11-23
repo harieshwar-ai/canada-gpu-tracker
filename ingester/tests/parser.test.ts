@@ -28,7 +28,19 @@ test("Canada Computers parser reads JSON-LD product", async () => {
   assert.equal(parsed!.brand, "MSI");
   assert.equal(parsed!.sku, "VCMSI00514");
   assert.equal(parsed!.priceCad, 1989.99);
-  assert.equal(parsed!.inStockOnline, false);
+  assert.ok(parsed!.inStockOnline, "in stock when any store has quantity");
+  assert.ok((parsed!.storeStock?.filter((s) => s.quantity > 0).length ?? 0) >= 12);
+});
+
+test("Canada Computers parser maps Edmonton store labels", async () => {
+  const html = await loadFixture(
+    "canada-computers",
+    "msi-rtx-5070ti-ventus.html"
+  );
+  const parsed = parseCanadaComputersProduct(html, "https://example.test/cc");
+  assert.ok(
+    parsed?.storeStock?.some((s) => s.storeKey === "cc-edmonton-south-park")
+  );
 });
 
 test("PC-Canada parser reads in-stock price", async () => {
