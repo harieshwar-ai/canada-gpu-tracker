@@ -1,6 +1,7 @@
 ---
 import { getCheapestPerGpu } from "../lib/store";
 import { formatCad } from "../lib/format";
+import { gpuUrl, cardUrl } from "../lib/routes";
 
 const rows = getCheapestPerGpu();
 const retailerShort: Record<string, string> = {
@@ -18,7 +19,7 @@ const retailerShort: Record<string, string> = {
   <h2 class="section-h">Cheapest in stock, per GPU</h2>
   {rows.map((row) => (
     <article class="cheap-row card">
-      <a href={`/gpu/${row.gpu.slug}/`} class="cheap-gpu">
+      <a href={gpuUrl(row.gpu.slug)} class="cheap-gpu">
         <strong>{row.gpu.modelName.replace("GeForce ", "")}</strong>
         <span class="spec-line">{row.specLine}</span>
       </a>

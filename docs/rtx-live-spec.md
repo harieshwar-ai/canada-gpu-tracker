@@ -2,7 +2,7 @@
 
 > **Purpose:** Phase-1 reference derived from a Playwright walkthrough of https://rtx.live (Nov 2026).  
 > **Usage:** Canada GPU Tracker implementation must match layout, IA, interactions, and density **without** copying branding, assets, or verbatim copy.  
-> **Implementation status:** Checkboxes updated in Phase 2 (`[ ]` = not done, `[x]` = done, `[~]` = stubbed + reason).
+> **Implementation status (Phase 2):** `[x]` done, `[~]` stubbed, `[ ]` not done. Updated after rebuild to match `docs/rtx-live-spec.md` as source of truth.
 
 **Screenshot index:** `docs/reference/rtx-live/` (see [README](./reference/rtx-live/README.md)).
 

@@ -1,0 +1,26 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import PlaceholderBanner from "../../components/PlaceholderBanner.astro";
+import { buildCardRows } from "../../lib/catalog";
+import { cardUrl } from "../../lib/routes";
+
+export function getStaticPaths() {
+  const brands = ["asus", "msi", "gigabyte", "pny", "zotac", "nvidia", "palit"];
+  return brands.map((brand) => ({ params: { brand } }));
+}
+const brand = Astro.params.brand!;
+const rows = buildCardRows().filter((r) => r.card.brand.toLowerCase() === brand);
+---
+
+<Layout title={`${brand.toUpperCase()} graphics cards`} description={`${brand} GPUs in Canada (placeholder).`}>
+  <PlaceholderBanner />
+  <main id="main" class="page-wrap">
+    <h1>{brand.toUpperCase()}</h1>
+    <p class="muted">{rows.length} cards</p>
+    <ul class="fresh-list">
+      {rows.map((r) => (
+        <li><a href={cardUrl(r.card.slug)}>{r.card.modelName}</a> · {r.gpu.modelName}</li>
+      ))}
+    </ul>
+  </main>
+</Layout>

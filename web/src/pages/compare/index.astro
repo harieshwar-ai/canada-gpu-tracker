@@ -1,0 +1,29 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import PlaceholderBanner from "../../components/PlaceholderBanner.astro";
+import { buildCardRows } from "../../lib/catalog";
+import { cardUrl } from "../../lib/routes";
+import { formatCad } from "../../lib/format";
+const rows = buildCardRows().filter((r) => r.inStock).slice(0, 3);
+---
+
+<Layout title="Compare — Canada GPU Tracker" description="Compare graphics cards side by side (placeholder).">
+  <PlaceholderBanner />
+  <main id="main" class="page-wrap">
+    <h1>Compare</h1>
+    <p class="muted">Select cards from the catalog to compare (stub shows top 3 in-stock).</p>
+    <table class="data-table panel">
+      <thead><tr><th>Card</th><th>Price</th><th>VRAM</th><th>Length</th></tr></thead>
+      <tbody>
+        {rows.map((r) => (
+          <tr>
+            <td><a href={cardUrl(r.card.slug)}>{r.card.brand} {r.card.modelName}</a></td>
+            <td>{r.lowest != null ? formatCad(r.lowest) : "—"}</td>
+            <td>{r.card.vramGb} GB</td>
+            <td>{r.card.lengthMm} mm</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </main>
+</Layout>

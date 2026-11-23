@@ -1,0 +1,89 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import PlaceholderBanner from "../../components/PlaceholderBanner.astro";
+import PriceChart from "../../components/PriceChart.astro";
+import Sparkline from "../../components/ui/Sparkline.astro";
+import {
+  getAllCards,
+  getCardBySlug,
+  getGpuMap,
+  getOffersForCard,
+  getPriceHistoryForCard,
+  getStore,
+} from "../../lib/store";
+import { buildCardRows } from "../../lib/catalog";
+import { formatCad, formatShortDate } from "../../lib/format";
+import { gpuUrl } from "../../lib/routes";
+
+export function getStaticPaths() {
+  return getAllCards().map((c) => ({ params: { slug: c.slug } }));
+}
+
+const { slug } = Astro.params;
+const card = getCardBySlug(slug!);
+if (!card) return Astro.redirect("/404");
+
+const gpu = getGpuMap().get(card.gpuId)!;
+const offers = getOffersForCard(card.id);
+const chart = getPriceHistoryForCard(card.id);
+const taxes = getStore().provinceTaxes;
+const row = buildCardRows().find((r) => r.card.id === card.id);
+
+const pageTitle = `${card.brand} ${card.modelName} price & stock (CAD)`;
+const pageDescription = `Canadian prices and store stock for ${card.brand} ${card.modelName}. Placeholder data.`;
+---
+
+<Layout title={pageTitle} description={pageDescription} ogType="article">
+  <PlaceholderBanner />
+  <main id="main" class="page-wrap">
+    <nav class="breadcrumbs muted small">
+      <a href="/">Home</a> · <a href={gpuUrl(gpu.slug)}>{gpu.modelName}</a> · {card.modelName}
+    </nav>
+    <header class="panel" style="padding:1rem">
+      <p class="eyebrow">{gpu.modelName}</p>
+      <h1>{card.brand} {card.modelName}</h1>
+      <p class="mono small muted">{card.lengthMm}mm · {card.slotWidth}s · {card.cooling} · {card.powerConnector} · {card.psuWatts}W PSU</p>
+      {row?.lowest != null && (
+        <p class="best-now">
+          Best price now <strong>{formatCad(row.lowest)}</strong>
+          {row.pctMsrp != null && <span class="pct"> ({row.pctMsrp > 0 ? "+" : ""}{row.pctMsrp}% vs MSRP)</span>}
+          {row.sparkline.length > 1 && <Sparkline prices={row.sparkline} />}
+        </p>
+      )}
+      <a href={`/alerts/?card=${card.slug}`} class="btn-primary">Set a price alert (stub)</a>
+    </header>
+
+    <h2 class="section-head"><span>Offers</span></h2>
+    <div class="table-wrap panel">
+      <table class="data-table">
+        <thead>
+          <tr><th>Retailer</th><th>Location</th><th>Condition</th><th>Price</th><th>Tax hint</th><th>Stock</th></tr>
+        </thead>
+        <tbody>
+          {offers.map(({ offer, retailer, store: st, latest }) => {
+            const tax = st ? taxes.find((t) => t.provinceCode === st.provinceCode) : taxes[0];
+            const withTax = latest && tax ? latest.priceCad * (1 + tax.taxRate) : null;
+            return (
+              <tr>
+                <td>{retailer.name}</td>
+                <td>{st ? `${st.city}, ${st.provinceCode}` : "Online"}</td>
+                <td>{offer.condition.replace("_", " ")}</td>
+                <td>{latest ? formatCad(latest.priceCad) : "—"}</td>
+                <td class="muted small">{withTax && tax ? `${formatCad(withTax)} ${tax.taxLabel}` : "—"}</td>
+                <td>{latest?.inStock ? "In stock" : "Out"}</td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </div>
+
+    <h2 class="section-head"><span>Price history</span></h2>
+    <PriceChart series={chart} />
+  </main>
+</Layout>
+
+<style>
+  .best-now { display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center; }
+  .eyebrow { margin: 0; color: var(--muted); font-size: 0.8rem; }
+</style>

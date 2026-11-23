@@ -8,9 +8,11 @@ const cardMap = getCardMap();
 const gpuMap = getGpuMap();
 ---
 
-<section class="section">
-  <h2 class="section-h">Live changes</h2>
-  <ul class="change-feed">
+<section class="panel">
+  <div class="panel-head">
+    <h2>Live changes</h2>
+  </div>
+  <ul class="change-list">
     {events.map((ev) => {
       const card = cardMap.get(ev.cardId);
       const gpu = card ? gpuMap.get(card.gpuId) : undefined;
@@ -25,16 +27,20 @@ const gpuMap = getGpuMap();
       }
       const place = ev.city ? ` · ${ev.city}` : "";
       return (
-        <li>
-          <a href={card ? `/card/${card.slug}/` : "#"} class="change-main">
-            <span class="change-gpu">{gpu?.modelName.replace("GeForce ", "")}</span>
-            <span class="change-card">{card?.brand} {card?.modelName}</span>
+        <li class="change-item">
+          <a href={card ? `/cards/${card.slug}/` : "#"}>
+            <span class={`change-icon ${ev.eventType === "price_drop" ? "drop" : ev.eventType === "in_stock" ? "stock" : "out"}`}>
+              {ev.eventType === "price_drop" ? "↓" : ev.eventType === "in_stock" ? "✓" : "×"}
+            </span>
+            <span>
+              <span class="change-title">{gpu?.modelName.replace("GeForce ", "")} {card?.brand} {card?.modelName}</span>
+              <span class="change-meta">
+                {detail}
+                {place} · {timeAgo(ev.occurredAt)}
+              </span>
+            </span>
+            {ev.priceCad != null && <span class="change-price">{formatCad(ev.priceCad)}</span>}
           </a>
-          <span class="change-meta">
-            {detail}
-            {place} · {timeAgo(ev.occurredAt)}
-            {ev.priceCad != null && ` · ${formatCad(ev.priceCad)}`}
-          </span>
         </li>
       );
     })}

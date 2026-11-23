@@ -1,0 +1,14 @@
+---
+interface Props {
+  pct: number | null;
+  maxScale?: number;
+}
+
+const { pct, maxScale = 250 } = Astro.props;
+const width =
+  pct == null ? 0 : Math.min(100, Math.max(4, (Math.max(0, pct + 100) / maxScale) * 100));
+---
+
+<div class="msrp-meter" title="Lowest in-stock vs launch MSRP">
+  <span style={`width:${width}%`} />
+</div>

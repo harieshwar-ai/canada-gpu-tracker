@@ -1,0 +1,41 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import PlaceholderBanner from "../../components/PlaceholderBanner.astro";
+import { getStore, getRetailerMap, getOffersForCard, getAllCards } from "../../lib/store";
+import { formatCad } from "../../lib/format";
+import { cardUrl } from "../../lib/routes";
+
+export function getStaticPaths() {
+  return getStore().stores.map((s) => ({ params: { slug: s.slug } }));
+}
+
+const slug = Astro.params.slug!;
+const store = getStore().stores.find((s) => s.slug === slug);
+if (!store) return Astro.redirect("/404");
+const retailer = getRetailerMap().get(store.retailerId)!;
+const offers = getStore().offers.filter((o) => o.storeId === store.id);
+const cards = getAllCards();
+---
+
+<Layout title={`${store.name} — Canada GPU Tracker`} description={`Shelf stock at ${store.name} (placeholder).`}>
+  <PlaceholderBanner />
+  <main id="main" class="page-wrap">
+    <h1>{store.name}</h1>
+    <p class="muted">{retailer.name} · {store.city}, {store.provinceCode}</p>
+    <table class="data-table panel">
+      <tbody>
+        {offers.map((o) => {
+          const card = cards.find((c) => c.id === o.cardId)!;
+          const latest = getOffersForCard(card.id).find((x) => x.offer.id === o.id)?.latest;
+          return (
+            <tr>
+              <td><a href={cardUrl(card.slug)}>{card.brand} {card.modelName}</a></td>
+              <td>{latest ? formatCad(latest.priceCad) : "—"}</td>
+              <td>{latest?.inStock ? "In stock" : "Out"}</td>
+            </tr>
+          );
+        })}
+      </tbody>
+    </table>
+  </main>
+</Layout>

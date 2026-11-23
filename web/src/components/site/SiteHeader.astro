@@ -1,0 +1,134 @@
+---
+import { getSiteStats, getGeForce50Gpus, getAllGpus, getProGpus } from "../../lib/store";
+import { gpuUrl } from "../../lib/routes";
+
+const stats = getSiteStats();
+const gpu50 = getGeForce50Gpus();
+const gpu40 = getAllGpus().filter((g) => g.series === "40-series");
+const pro = getProGpus();
+const brands = ["ASUS", "MSI", "Gigabyte", "PNY", "ZOTAC", "NVIDIA", "Palit"];
+---
+
+<a class="skip-link" href="#main">Skip to content</a>
+<header class="topbar">
+  <div class="topbar-inner topbar-row">
+    <a href="/" class="brand"><span>Canada</span> GPU Tracker</a>
+    <form class="search-wrap" action="/cards/" method="get" role="search">
+      <span aria-hidden="true">⌕</span>
+      <input type="search" name="q" placeholder="Search cards or GPUs" aria-label="Search" />
+      <kbd>/</kbd>
+    </form>
+    <div class="topbar-actions">
+      <a href="/preferences/" class="btn-ghost">Preferences</a>
+      <a href="/preferences/#location" class="btn-ghost location-chip">📍 Postal</a>
+      <button type="button" class="btn-ghost" id="theme-toggle" aria-label="Switch theme">Theme</button>
+      <a href="/alerts/" class="btn-ghost">Alerts</a>
+    </div>
+  </div>
+  <nav class="main-nav" aria-label="Main">
+    <div class="nav-inner nav-scroll">
+      <details class="nav-dd">
+        <summary>GPUs</summary>
+        <div class="dd-panel">
+          <p class="dd-label">GeForce 50</p>
+          {gpu50.map((g) => (
+            <a href={gpuUrl(g.slug)}>{g.modelName.replace("GeForce ", "")}</a>
+          ))}
+          <p class="dd-label">GeForce 40</p>
+          {gpu40.map((g) => (
+            <a href={gpuUrl(g.slug)}>{g.modelName.replace("GeForce ", "")}</a>
+          ))}
+          <p class="dd-label">RTX PRO</p>
+          {pro.map((g) => (
+            <a href={gpuUrl(g.slug)}>{g.modelName}</a>
+          ))}
+          <a href="/gpus/">All GPUs</a>
+        </div>
+      </details>
+      <details class="nav-dd">
+        <summary>Brands</summary>
+        <div class="dd-panel">
+          {brands.map((b) => (
+            <a href={`/brands/${b.toLowerCase()}/`}>{b}</a>
+          ))}
+        </div>
+      </details>
+      <a href="/cards/">All cards</a>
+      <a href="/cards/?avail=stock">In stock now</a>
+      <a href="/deals/">Deals</a>
+      <a href="/finder/">Finder</a>
+      <a href="/compare/">Compare</a>
+      <a href="/stores/">Stores</a>
+      <span class="nav-meta">
+        Live prices · {stats.stores} stores · {stats.retailers} retailers
+      </span>
+    </div>
+  </nav>
+</header>
+
+<script>
+  document.getElementById("theme-toggle")?.addEventListener("click", () => {
+    const root = document.documentElement;
+    const next = root.dataset.theme === "light" ? "dark" : "light";
+    if (next === "light") root.dataset.theme = "light";
+    else delete root.dataset.theme;
+    localStorage.setItem("cgt-theme", next);
+  });
+  const saved = localStorage.getItem("cgt-theme");
+  if (saved === "light") document.documentElement.dataset.theme = "light";
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "/" && !(e.target as HTMLElement).matches("input,textarea")) {
+      e.preventDefault();
+      const input = document.querySelector<HTMLInputElement>('.search-wrap input[name="q"]');
+      input?.focus();
+    }
+  });
+</script>
+
+<style>
+  .nav-dd {
+    position: relative;
+  }
+  .nav-dd summary {
+    list-style: none;
+    cursor: pointer;
+    white-space: nowrap;
+    font-size: 0.88rem;
+    color: var(--muted);
+    padding: 0.5rem 0.65rem;
+  }
+  .nav-dd[open] summary {
+    color: var(--text);
+  }
+  .dd-panel {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    z-index: 50;
+    min-width: 220px;
+    max-height: 70vh;
+    overflow: auto;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    border-radius: var(--radius);
+    padding: 0.5rem;
+    display: grid;
+    gap: 0.25rem;
+  }
+  .dd-panel a {
+    font-size: 0.82rem;
+    color: var(--text);
+    padding: 0.25rem 0.35rem;
+    border-radius: 4px;
+  }
+  .dd-panel a:hover {
+    background: var(--surface-hover);
+    text-decoration: none;
+  }
+  .dd-label {
+    margin: 0.35rem 0 0.15rem;
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    color: var(--dim);
+  }
+</style>

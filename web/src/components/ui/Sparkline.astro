@@ -1,0 +1,11 @@
+---
+import { sparklineSvg } from "../../lib/sparkline";
+
+interface Props {
+  prices: number[];
+}
+
+const { prices } = Astro.props;
+---
+
+<div class="sparkline-wrap" set:html={sparklineSvg(prices)} />

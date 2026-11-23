@@ -1,0 +1,23 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import PlaceholderBanner from "../../components/PlaceholderBanner.astro";
+import { getStore, getRetailerMap } from "../../lib/store";
+
+const stores = getStore().stores;
+const retailers = getRetailerMap();
+---
+
+<Layout title="Stores — Canada GPU Tracker" description="Canadian store locations (placeholder).">
+  <PlaceholderBanner />
+  <main id="main" class="page-wrap">
+    <h1>Stores</h1>
+    <div class="card-feed">
+      {stores.map((s) => (
+        <a class="offer-card" href={`/stores/${s.slug}/`}>
+          <strong>{s.name}</strong>
+          <span class="muted small">{retailers.get(s.retailerId)?.name} · {s.city}, {s.provinceCode}</span>
+        </a>
+      ))}
+    </div>
+  </main>
+</Layout>

@@ -1,0 +1,63 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import PlaceholderBanner from "../../components/PlaceholderBanner.astro";
+import { getStore } from "../../lib/store";
+const retailers = getStore().retailers;
+---
+
+<Layout title="Shopping preferences" description="Location, distance, and retailer filters (local stub).">
+  <PlaceholderBanner />
+  <main id="main" class="page-wrap">
+    <h1>Shopping preferences</h1>
+    <p class="muted">Saved in <code>localStorage</code> for this placeholder build.</p>
+    <form class="card alert-form" id="prefs">
+      <fieldset>
+        <legend>Where do you buy?</legend>
+        <label><input type="radio" name="mode" value="all" checked /> Stores and online</label>
+        <label><input type="radio" name="mode" value="near" /> Stores near me</label>
+        <label><input type="radio" name="mode" value="online" /> Online only</label>
+      </fieldset>
+      <label id="location">Postal code <input name="postal" id="postal" placeholder="M5V 3A8" /></label>
+      <label>Within (km)
+        <select name="km">
+          <option value="25">25 km</option>
+          <option value="50" selected>50 km</option>
+          <option value="100">100 km</option>
+          <option value="200">200 km</option>
+        </select>
+      </label>
+      <fieldset>
+        <legend>Condition</legend>
+        <label><input type="checkbox" name="cond" value="new" checked /> New</label>
+        <label><input type="checkbox" name="cond" value="open_box" /> Open box</label>
+        <label><input type="checkbox" name="cond" value="refurb" /> Refurbished</label>
+      </fieldset>
+      <p class="small muted">Retailers: {retailers.map((r) => r.name).join(", ")}</p>
+      <button type="submit" class="btn-primary">Save preferences</button>
+      <p id="prefs-status" class="muted small"></p>
+    </form>
+  </main>
+  <script>
+    const key = "cgt-prefs";
+    const form = document.getElementById("prefs") as HTMLFormElement;
+    const status = document.getElementById("prefs-status");
+    const saved = localStorage.getItem(key);
+    if (saved) {
+      try {
+        const p = JSON.parse(saved);
+        if (p.postal) (form.elements.namedItem("postal") as HTMLInputElement).value = p.postal;
+      } catch {}
+    }
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const fd = new FormData(form);
+      localStorage.setItem(key, JSON.stringify(Object.fromEntries(fd.entries())));
+      if (status) status.textContent = "Preferences saved for this browser.";
+    });
+  </script>
+</Layout>
+
+<style>
+  .alert-form label { display: block; margin: 0.5rem 0; }
+  fieldset { border: 1px solid var(--border); margin: 1rem 0; padding: 0.75rem; border-radius: var(--radius); }
+</style>

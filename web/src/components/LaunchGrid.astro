@@ -1,6 +1,8 @@
 ---
 import { getLaunchPriceGrid } from "../lib/store";
 import { formatCad } from "../lib/format";
+import { gpuUrl } from "../lib/routes";
+import MsrpBar from "./ui/MsrpBar.astro";
 
 const rows = getLaunchPriceGrid();
 ---
@@ -9,7 +11,7 @@ const rows = getLaunchPriceGrid();
   <h2 class="section-h">GeForce 50 vs launch price (CAD)</h2>
   <div class="launch-grid">
     {rows.map((row) => (
-      <a href={`/gpu/${row.gpu.slug}/`} class="launch-card card">
+      <a href={gpuUrl(row.gpu.slug)} class="launch-card card">
         <h3>{row.gpu.modelName.replace("GeForce ", "")}</h3>
         <p class="launch-sub">
           {row.gpu.vramGb}GB · MSRP {formatCad(row.gpu.launchMsrpCad)}
@@ -17,20 +19,21 @@ const rows = getLaunchPriceGrid();
         <p class="launch-price">
           {row.storesInStock} {row.storesInStock === 1 ? "store" : "stores"}
         </p>
-        <p class="launch-cad">
+        <div class="launch-cad">
           {row.cheapestInStock != null ? (
             <>
-              {formatCad(row.cheapestInStock)}
+              <span class="amt">{formatCad(row.cheapestInStock)}</span>
               {row.pctOverMsrp != null && (
-                <span class={row.pctOverMsrp > 0 ? "over" : "under"}>
+                <span class={row.pctOverMsrp > 0 ? "over pct" : "under pct"}>
                   {row.pctOverMsrp > 0 ? `+${row.pctOverMsrp}%` : `${row.pctOverMsrp}%`}
                 </span>
               )}
+              <MsrpBar pct={row.pctOverMsrp} />
             </>
           ) : (
-            <span class="muted">0 in stock</span>
+            <span class="muted">sold out</span>
           )}
-        </p>
+        </div>
         <p class="launch-stock">
           {row.cardsInStock}/{row.cardsTotal} cards in stock
         </p>
