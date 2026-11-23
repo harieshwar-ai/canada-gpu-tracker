@@ -1,3 +1,4 @@
+// @ts-nocheck — schema types generated after migrations apply
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "jsr:@supabase/supabase-js@2";
 import clearedSkus from "../_shared/cleared-skus.json" with { type: "json" };

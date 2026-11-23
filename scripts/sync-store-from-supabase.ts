@@ -2,6 +2,7 @@ import { copyFile, writeFile, mkdir } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { createClient } from "@supabase/supabase-js";
+import ws from "ws";
 import type {
   TrackerStore,
   Gpu,
@@ -90,8 +91,22 @@ function mapCard(row: Record<string, unknown>): Card {
   };
 }
 
+function createSupabaseClient() {
+  return createClient(SUPABASE_URL, SUPABASE_KEY, {
+    auth: { persistSession: false, autoRefreshToken: false },
+    realtime: { transport: ws as unknown as typeof WebSocket },
+  });
+}
+
 async function fetchTrackerStore(): Promise<TrackerStore | null> {
-  const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+  let supabase;
+  try {
+    supabase = createSupabaseClient();
+  } catch (err) {
+    console.warn("Supabase client init failed:", err);
+    return null;
+  }
+  try {
   const [
     gpusRes,
     retailersRes,
@@ -188,6 +203,10 @@ async function fetchTrackerStore(): Promise<TrackerStore | null> {
     changeEvents,
     provinceTaxes,
   };
+  } catch (err) {
+    console.warn("Supabase fetch failed:", err);
+    return null;
+  }
 }
 
 async function main(): Promise<void> {
