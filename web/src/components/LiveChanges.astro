@@ -1,42 +1,57 @@
 ---
-import { getLiveChanges, getCardMap, getGpuMap } from "../lib/store";
-import { formatCad } from "../lib/format";
+import { getLiveActivity } from "../lib/store";
 import { timeAgo } from "../lib/time";
 
-const events = getLiveChanges(8);
-const cardMap = getCardMap();
-const gpuMap = getGpuMap();
+const events = getLiveActivity(8);
 ---
 
-<section class="section">
-  <h2 class="section-h">Live changes</h2>
-  <ul class="change-feed">
-    {events.map((ev) => {
-      const card = cardMap.get(ev.cardId);
-      const gpu = card ? gpuMap.get(card.gpuId) : undefined;
-      let detail = "";
-      if (ev.eventType === "price_drop" && ev.priceCad != null && ev.previousPriceCad != null) {
-        const delta = ev.previousPriceCad - ev.priceCad;
-        detail = `−${formatCad(delta)}`;
-      } else if (ev.eventType === "in_stock") {
-        detail = "In stock";
-      } else {
-        detail = "Sold out";
-      }
-      const place = ev.city ? ` · ${ev.city}` : "";
-      return (
-        <li>
-          <a href={card ? `/card/${card.slug}/` : "#"} class="change-main">
-            <span class="change-gpu">{gpu?.modelName.replace("GeForce ", "")}</span>
-            <span class="change-card">{card?.brand} {card?.modelName}</span>
+<section class="panel" style="padding: 0.75rem 1rem">
+  <div class="panel-head">
+    <h2>Live changes</h2>
+  </div>
+  {events.length === 0 ? (
+    <p class="muted small live-empty">No live ingested price changes yet. Cleared retailers will appear here after the next successful crawl.</p>
+  ) : (
+    <ul class="change-list">
+      {events.map((ev) => (
+        <li class="change-item">
+          <a href={ev.href} class="change-link">
+            <strong>{ev.title}</strong>
+            <span class="muted small">{ev.detail}</span>
           </a>
-          <span class="change-meta">
-            {detail}
-            {place} · {timeAgo(ev.occurredAt)}
-            {ev.priceCad != null && ` · ${formatCad(ev.priceCad)}`}
-          </span>
+          <span class="muted small">{timeAgo(ev.occurredAt)}</span>
         </li>
-      );
-    })}
-  </ul>
+      ))}
+    </ul>
+  )}
 </section>
+
+<style>
+  .change-list {
+    list-style: none;
+    margin: 0.5rem 0 0;
+    padding: 0;
+    display: grid;
+    gap: 0.65rem;
+  }
+  .change-item {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 0.35rem;
+    align-items: baseline;
+  }
+  .change-link {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    color: var(--text);
+    text-decoration: none;
+  }
+  .change-link:hover strong {
+    color: var(--accent);
+  }
+  .live-empty {
+    margin: 0.75rem 0 0.25rem;
+  }
+</style>
