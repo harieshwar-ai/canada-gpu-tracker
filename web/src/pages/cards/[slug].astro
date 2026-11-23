@@ -12,7 +12,7 @@ import {
   getStore,
 } from "../../lib/store";
 import { buildCardRows } from "../../lib/catalog";
-import { formatCad, formatCardSpec } from "../../lib/format";
+import { formatCad, formatCardSpec, formatOfferLocation } from "../../lib/format";
 import { gpuUrl } from "../../lib/routes";
 import type { Offer } from "../../../../types/db";
 
@@ -89,7 +89,7 @@ const pageDescription = `Canadian prices and store stock for ${card.brand} ${car
                     <span class="example-pill">Example</span>
                   )}
                 </td>
-                <td>{st ? `${st.city}, ${st.provinceCode}` : "Online"}</td>
+                <td>{formatOfferLocation(st)}</td>
                 <td>{offer.condition.replace("_", " ")}</td>
                 <td>{latest ? formatCad(latest.priceCad) : "—"}</td>
                 <td class="muted small">
@@ -119,7 +119,7 @@ const pageDescription = `Canadian prices and store stock for ${card.brand} ${car
                 )}
               </div>
               <p class="muted small">
-                {st ? `${st.city}, ${st.provinceCode}` : "Online"} ·{" "}
+                {formatOfferLocation(st)} ·{" "}
                 {offer.condition.replace("_", " ")}
               </p>
               <p class="offer-card-price">

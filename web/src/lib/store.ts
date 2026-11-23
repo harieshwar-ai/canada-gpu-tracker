@@ -10,6 +10,7 @@ import type {
   OfferCondition,
 } from "../../../types/db";
 import storeJson from "../../../data/store.json";
+import { formatOfferLocation } from "./format";
 
 const store = storeJson as TrackerStore;
 
@@ -414,7 +415,7 @@ export function getPriceHistoryForCard(cardId: string) {
     const retailer = retailerMap.get(offer.retailerId);
     const st = offer.storeId ? storeMap.get(offer.storeId) : null;
     const label = st
-      ? `${retailer?.name} · ${st.city}`
+      ? `${retailer?.name} · ${formatOfferLocation(st)}`
       : retailer?.name ?? "Offer";
     return {
       offerId: offer.id,

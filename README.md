@@ -77,3 +77,7 @@ TypeScript: `types/db.ts`
 Canonical deploy: `supabase/migrations/*`
 
 Static Astro site aligned to the spec: `/`, `/gpus/*`, `/cards/*`, deals/discovery routes, stores, preferences, and `/alerts/`. Legacy `/gpu/*` and `/card/*` redirect to new paths. Build syncs from Supabase via `scripts/sync-store-from-supabase.ts` (see `vercel.json` for deploy env).
+
+### Vercel (static Astro)
+
+Root `vercel.json`: `npm ci` → `npm run build` (runs `sync:store` then `web` build), output `web/dist`. Optional build env: `PUBLIC_SUPABASE_URL`, `PUBLIC_SUPABASE_PUBLISHABLE_KEY` (defaults match `scripts/sync-store-from-supabase.ts`). Optional `SITE_URL` or Vercel’s `VERCEL_PROJECT_PRODUCTION_URL` for canonical/OG URLs (`web/astro.config.mjs`).
