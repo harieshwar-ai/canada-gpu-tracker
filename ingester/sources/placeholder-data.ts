@@ -28,6 +28,8 @@ export const PLACEHOLDER_GPUS: Gpu[] = [
 ];
 
 export const PLACEHOLDER_RETAILERS: Retailer[] = [
+  { id: "ret-pc-canada", slug: "pc-canada", name: "PC-Canada", websiteUrl: "https://www.pc-canada.com", countryCode: "CA", hasPhysicalStores: false, createdAt: T0 },
+  { id: "ret-mikes-computer-shop", slug: "mikes-computer-shop", name: "Mike's Computer Shop", websiteUrl: "https://www.mikescomputershop.com", countryCode: "CA", hasPhysicalStores: false, createdAt: T0 },
   { id: "ret-best-buy-ca", slug: "best-buy-ca", name: "Best Buy Canada", websiteUrl: "https://www.bestbuy.ca", countryCode: "CA", hasPhysicalStores: true, createdAt: T0 },
   { id: "ret-canada-computers", slug: "canada-computers", name: "Canada Computers", websiteUrl: "https://www.canadacomputers.com", countryCode: "CA", hasPhysicalStores: true, createdAt: T0 },
   { id: "ret-memory-express", slug: "memory-express", name: "Memory Express", websiteUrl: "https://www.memoryexpress.com", countryCode: "CA", hasPhysicalStores: true, createdAt: T0 },

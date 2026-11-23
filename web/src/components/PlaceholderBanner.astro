@@ -1,8 +1,20 @@
 ---
+import { getStore } from "../lib/store";
+
+const store = getStore();
+const hasLive = store.liveOfferCount > 0;
+const allPlaceholder = store.placeholder;
 ---
 
-<div class="banner-placeholder" role="status">
-  <strong>PLACEHOLDER DATA</strong> — CAD prices, cities, and stock are fabricated examples.
-  No Canadian retailer sites are fetched or scraped in this build. Real sources plug in via
-  cleared adapters only.
-</div>
+{allPlaceholder ? (
+  <div class="banner-placeholder" role="status">
+    <strong>PLACEHOLDER DATA</strong> — CAD prices, cities, and stock are fabricated
+    examples for retailers not yet on cleared live ingesters. Cleared sources (PC-Canada,
+    Mike's Computer Shop, Canada Computers) use polite crawls when <code>INGEST_LIVE=1</code>.
+  </div>
+) : hasLive ? (
+  <div class="banner-live-mixed" role="status">
+    <strong>LIVE + PLACEHOLDER</strong> — Rows tagged <em>Example</em> are illustrative only.
+    Canada Computers links stay on-site (no outbound retailer URLs) per ToS.
+  </div>
+) : null}

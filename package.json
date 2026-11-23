@@ -4,7 +4,12 @@
   "type": "module",
   "scripts": {
     "ingest": "tsx ingester/run.ts",
-    "prebuild": "npm run ingest",
+    "ingest:live": "INGEST_LIVE=1 tsx ingester/run.ts",
+    "ingest:dry-run": "INGEST_LIVE=1 INGEST_DRY_RUN=1 tsx ingester/run.ts",
+    "sync:store": "tsx scripts/sync-store-from-supabase.ts",
+    "test": "tsx --test ingester/tests/*.test.ts",
+    "check:functions": "cd supabase/functions && deno check ingest/index.ts create-price-alert/index.ts",
+    "prebuild": "npm run sync:store",
     "build": "npm run build --workspace=web",
     "dev": "npm run dev --workspace=web",
     "preview": "npm run preview --workspace=web"
@@ -12,6 +17,10 @@
   "workspaces": [
     "web"
   ],
+  "dependencies": {
+    "@supabase/supabase-js": "^2.49.1",
+    "ws": "^8.18.0"
+  },
   "devDependencies": {
     "tsx": "^4.19.2",
     "typescript": "^5.7.2"
