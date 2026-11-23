@@ -13,8 +13,8 @@ const rows = buildCardRows().filter((r) => r.card.brand.toLowerCase() === brand)
 ---
 
 <Layout title={`${brand.toUpperCase()} graphics cards`} description={`${brand} GPUs in Canada (placeholder).`}>
-  <PlaceholderBanner />
   <main id="main" class="page-wrap">
+    <PlaceholderBanner />
     <h1>{brand.toUpperCase()}</h1>
     <p class="muted">{rows.length} cards</p>
     <ul class="fresh-list">

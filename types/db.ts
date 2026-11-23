@@ -71,6 +71,7 @@ export interface Offer {
   brand: string;
   variantLabel: string | null;
   condition: OfferCondition;
+  isPlaceholder?: boolean;
   createdAt: string;
   updatedAt: string;
 }
