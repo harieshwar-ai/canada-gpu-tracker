@@ -6,7 +6,29 @@ export function formatCad(amount: number): string {
   }).format(amount);
 }
 
-import type { Card } from "../../../types/db";
+import type { Card, Store } from "../../../types/db";
+
+const STORE_NAME_PREFIXES = [
+  "Canada Computers ",
+  "Memory Express ",
+  "Best Buy ",
+];
+
+/** Display label for offer location rows (e.g. Edmonton Northgate, AB). */
+export function formatOfferLocation(
+  store: Store | null | undefined,
+): string {
+  if (!store) return "Online";
+  let label = store.name.trim();
+  for (const prefix of STORE_NAME_PREFIXES) {
+    if (label.startsWith(prefix)) {
+      label = label.slice(prefix.length).trim();
+      break;
+    }
+  }
+  if (!label) label = store.city;
+  return `${label}, ${store.provinceCode}`;
+}
 
 export function formatCardSpec(card: Card): string | null {
   const parts: string[] = [];

@@ -2,7 +2,7 @@
 
 Canada-first NVIDIA GPU price tracker (feature parity target: [rtx.live](https://rtx.live/), adapted for CAD, Canadian retailers, cities/provinces, and shelf stock).
 
-**Placeholder data only** until retailer sources pass ToS / robots review. No scraping or live fetches in this repo.
+**Source of truth:** Supabase Postgres (`blfiydxlbfuusmcwbgvu`, `ca-central-1`). The static site snapshots public RLS reads at build time; uncleared retailers stay placeholder rows until policies allow live ingesters.
 
 **UX spec:** [`docs/rtx-live-spec.md`](docs/rtx-live-spec.md) (numbered checklists per section) · **Phase 2 status:** [`docs/rtx-live-spec-impl-status.md`](docs/rtx-live-spec-impl-status.md) · **rtx vs ours screenshots:** [`docs/compare/`](docs/compare/) · internal rtx reference: [`docs/reference/rtx-live/`](docs/reference/rtx-live/).
 
@@ -10,21 +10,74 @@ Canada-first NVIDIA GPU price tracker (feature parity target: [rtx.live](https:/
 
 ```bash
 npm install
-npm run build
+npm run build          # syncs from Supabase → data/store.json (or fallback)
 npm run preview --workspace=web
 ```
 
-## Schema
+Publishable client (safe in frontend): `sb_publishable_1KDjNKQmpzdgIJ9C_IZjoQ_QtJAS66`  
+Project URL: `https://blfiydxlbfuusmcwbgvu.supabase.co`
 
-- `db/migrations/001_init.sql` — core tables
-- `db/migrations/002_extended.sql` — stores, cards, conditions, change events, alerts, province taxes
+## Deploy (coordinator bot — apply in order)
 
-TypeScript: `types/db.ts` · JSON store v2: `data/store.json` (built by `npm run ingest`).
+### 1. Migrations (`supabase/migrations/`)
 
-## Ingestion
+| Order | File | Purpose |
+|------:|------|---------|
+| 1 | `20260123100000_extensions.sql` | `pgcrypto`, `pg_cron`, `pg_net`, `supabase_vault` |
+| 2 | `20260123100001_schema.sql` | Tables, views (`v_offers_enriched`, latest price) |
+| 3 | `20260123100002_rls.sql` | Public read-only + `create_price_alert` RPC |
+| 4 | `20260123100003_seed.sql` | GPU/card catalog, retailers (`is_cleared`), placeholder offers |
+| 5 | `20260123100004_vault_cron.sql` | Vault ingest secret + cron → `ingest` function |
+| 6 | `20260123100005_ingest_secret_rpc.sql` | `verify_ingest_secret` RPC (vault-backed when env unset) |
+| 7 | `20260123100006_views_security_invoker.sql` | Invoker views for anon reads |
+| 8 | `20260123100007_cc_stores_seed.sql` | Canada Computers store catalog (~42 locations) |
 
-`Source` adapter → `ingester/run.ts` → `data/store.json`. Only `PlaceholderSource` today. See README section in prior commits for adding cleared sources.
+Optionally, after migration 5: read vault secret `ingest_cron_secret` and set Edge Function env **`INGEST_CRON_SECRET`** to the same value (not stored in git). If unset, `ingest` verifies `x-ingest-secret` via `verify_ingest_secret`.
 
-## Web
+### 2. Edge Functions
 
-Static Astro site aligned to the spec: `/`, `/gpus/*`, `/cards/*`, deals/discovery routes, stores, preferences, `/alerts/` localStorage stub. Legacy `/gpu/*` and `/card/*` redirect to new paths.
+| Function | Path | Auth |
+|----------|------|------|
+| `ingest` | `supabase/functions/ingest/index.ts` | Header `x-ingest-secret` = `INGEST_CRON_SECRET`; service role inside |
+| `create-price-alert` | `supabase/functions/create-price-alert/index.ts` | Public + anon key; calls `create_price_alert` RPC |
+
+Deploy both with JWT verification disabled for `ingest` cron calls (secret header only), or verify per your security model.
+
+### 3. Local / CI verify
+
+```bash
+npm test
+npm run check:functions    # deno check edge functions
+npm run sync:store         # tries Supabase; falls back to data/store.fallback.json
+npm run build
+```
+
+Legacy Node ingester (`ingester/`) remains for parser unit tests; production ingest runs in Supabase Edge.
+
+## Cleared retailers
+
+| Retailer | Slug | Ingest |
+|----------|------|--------|
+| PC-Canada | `pc-canada` | Polite crawl; often Cloudflare-challenged from datacenters |
+| Mike's Computer Shop | `mikes-computer-shop` | Polite crawl |
+| Canada Computers | `canada-computers` | Crawl + store stock; **UI links stay internal** (`/internal/cc/{sku}`) |
+
+Uncleared retailers (Best Buy, Newegg, etc.) are **seed placeholder listings** only.
+
+## Web data layer
+
+- `scripts/sync-store-from-supabase.ts` — build-time snapshot via `@supabase/supabase-js` (anon RLS).
+- `web/src/lib/store.ts` — same `TrackerStore` shape as before (minimal UI churn).
+- `web/src/lib/supabase/env.ts` — URL + publishable key defaults.
+
+## Schema reference
+
+Historical SQL: `db/migrations/001_init.sql`, `002_extended.sql`  
+TypeScript: `types/db.ts`  
+Canonical deploy: `supabase/migrations/*`
+
+Static Astro site aligned to the spec: `/`, `/gpus/*`, `/cards/*`, deals/discovery routes, stores, preferences, and `/alerts/`. Legacy `/gpu/*` and `/card/*` redirect to new paths. Build syncs from Supabase via `scripts/sync-store-from-supabase.ts` (see `vercel.json` for deploy env).
+
+### Vercel (static Astro)
+
+Root `vercel.json`: `npm ci` → `npm run build` (runs `sync:store` then `web` build), output `web/dist`. Optional build env: `PUBLIC_SUPABASE_URL`, `PUBLIC_SUPABASE_PUBLISHABLE_KEY` (defaults match `scripts/sync-store-from-supabase.ts`). Optional `SITE_URL` or Vercel’s `VERCEL_PROJECT_PRODUCTION_URL` for canonical/OG URLs (`web/astro.config.mjs`).

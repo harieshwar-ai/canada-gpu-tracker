@@ -1,84 +1,8 @@
 ---
-import { getStore, getLiveChanges, getCardMap, getRetailerMap } from "../lib/store";
-import type { Offer } from "../../../types/db";
-import { formatCad } from "../lib/format";
+import { getLiveActivity } from "../lib/store";
 import { timeAgo } from "../lib/time";
 
-function isLiveOffer(o: Offer): boolean {
-  return o.isPlaceholder !== true;
-}
-
-interface ActivityItem {
-  title: string;
-  detail: string;
-  href: string;
-  occurredAt: string;
-}
-
-function buildLiveActivity(limit: number): ActivityItem[] {
-  const store = getStore();
-  const cardMap = getCardMap();
-  const retailerMap = getRetailerMap();
-  const items: ActivityItem[] = [];
-
-  for (const ev of getLiveChanges(limit * 2)) {
-    const card = cardMap.get(ev.cardId);
-    if (!card) continue;
-    if (ev.offerId) {
-      const offer = store.offers.find((o) => o.id === ev.offerId);
-      if (offer && !isLiveOffer(offer)) continue;
-    }
-    let detail = "";
-    if (ev.eventType === "price_drop" && ev.priceCad != null) {
-      detail = `Price drop · ${formatCad(ev.priceCad)}`;
-    } else if (ev.eventType === "in_stock") {
-      detail = "Back in stock";
-    } else {
-      detail = "Sold out";
-    }
-    items.push({
-      title: `${card.brand} ${card.modelName}`,
-      detail,
-      href: `/cards/${card.slug}/`,
-      occurredAt: ev.occurredAt,
-    });
-  }
-
-  const latest = new Map<string, import("../../../types/db").PriceObservation>();
-  for (const obs of store.priceObservations) {
-    const prev = latest.get(obs.offerId);
-    if (!prev || obs.observedAt > prev.observedAt) latest.set(obs.offerId, obs);
-  }
-
-  const seen = new Set(
-    items.map((i) => i.href)
-  );
-  for (const o of store.offers) {
-    if (!isLiveOffer(o)) continue;
-    const card = cardMap.get(o.cardId);
-    const retailer = retailerMap.get(o.retailerId);
-    if (!card || !retailer) continue;
-    const href = `/cards/${card.slug}/`;
-    if (seen.has(href)) continue;
-    const first = [...store.priceObservations]
-      .filter((p) => p.offerId === o.id)
-      .sort((a, b) => a.observedAt.localeCompare(b.observedAt))[0];
-    if (!first) continue;
-    seen.add(href);
-    items.push({
-      title: `${card.brand} ${card.modelName}`,
-      detail: `First seen · ${formatCad(first.priceCad)} · ${retailer.name}`,
-      href,
-      occurredAt: first.observedAt,
-    });
-  }
-
-  return items
-    .sort((a, b) => b.occurredAt.localeCompare(a.occurredAt))
-    .slice(0, limit);
-}
-
-const events = buildLiveActivity(8);
+const events = getLiveActivity(8);
 ---
 
 <section class="panel live-changes">
@@ -92,10 +16,10 @@ const events = buildLiveActivity(8);
       {events.map((ev) => (
         <li class="change-item">
           <a href={ev.href} class="change-link">
-            <span class="change-title">{ev.title}</span>
+            <span class="change-title">{ev.kind === "first_seen" ? "First seen: " : ""}{ev.title}</span>
             <span class="change-meta muted small">{ev.detail}</span>
           </a>
-          <span class="muted small">{timeAgo(ev.occurredAt)}</span>
+          <span class="change-time muted small">{timeAgo(ev.occurredAt)}</span>
         </li>
       ))}
     </ul>
@@ -116,6 +40,7 @@ const events = buildLiveActivity(8);
     justify-content: space-between;
     gap: 0.35rem;
     align-items: baseline;
+    min-width: 0;
   }
   .change-link {
     display: flex;
@@ -124,7 +49,8 @@ const events = buildLiveActivity(8);
     color: var(--text);
     text-decoration: none;
     min-width: 0;
-    flex: 1;
+    flex: 1 1 auto;
+    max-width: calc(100% - 4.5rem);
   }
   .change-link:hover .change-title {
     color: var(--accent);
@@ -132,6 +58,11 @@ const events = buildLiveActivity(8);
   .change-title {
     font-weight: 600;
     overflow-wrap: anywhere;
+  }
+  .change-time {
+    flex: 0 0 auto;
+    white-space: nowrap;
+    font-size: 0.8rem;
   }
   .live-empty {
     margin: 0.5rem 0 0.15rem;

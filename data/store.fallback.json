@@ -1,7 +1,8 @@
 {
   "version": 2,
-  "placeholder": true,
-  "generatedAt": "2026-11-23T10:42:29.058Z",
+  "placeholder": false,
+  "liveOfferCount": 2,
+  "generatedAt": "2026-11-23T10:12:06.738Z",
   "gpus": [
     {
       "id": "gpu-rtx-5090",
@@ -148,6 +149,24 @@
     }
   ],
   "retailers": [
+    {
+      "id": "ret-pc-canada",
+      "slug": "pc-canada",
+      "name": "PC-Canada",
+      "websiteUrl": "https://www.pc-canada.com",
+      "countryCode": "CA",
+      "hasPhysicalStores": false,
+      "createdAt": "2026-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "ret-mikes-computer-shop",
+      "slug": "mikes-computer-shop",
+      "name": "Mike's Computer Shop",
+      "websiteUrl": "https://www.mikescomputershop.com",
+      "countryCode": "CA",
+      "hasPhysicalStores": false,
+      "createdAt": "2026-01-01T00:00:00.000Z"
+    },
     {
       "id": "ret-best-buy-ca",
       "slug": "best-buy-ca",
@@ -301,6 +320,66 @@
       "countryCode": "CA",
       "latitude": 49.2838,
       "longitude": -123.1089,
+      "createdAt": "2026-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "store-cc-etobicoke",
+      "retailerId": "ret-canada-computers",
+      "slug": "cc-etobicoke",
+      "name": "Canada Computers Etobicoke",
+      "city": "Etobicoke",
+      "provinceCode": "ON",
+      "countryCode": "CA",
+      "latitude": 43.6205,
+      "longitude": -79.5132,
+      "createdAt": "2026-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "store-cc-toronto-dt",
+      "retailerId": "ret-canada-computers",
+      "slug": "cc-toronto-dt",
+      "name": "Canada Computers Toronto Downtown",
+      "city": "Toronto",
+      "provinceCode": "ON",
+      "countryCode": "CA",
+      "latitude": 43.6544,
+      "longitude": -79.3807,
+      "createdAt": "2026-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "store-cc-north-york",
+      "retailerId": "ret-canada-computers",
+      "slug": "cc-north-york",
+      "name": "Canada Computers North York Lawrence",
+      "city": "North York",
+      "provinceCode": "ON",
+      "countryCode": "CA",
+      "latitude": 43.7315,
+      "longitude": -79.4189,
+      "createdAt": "2026-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "store-cc-calgary",
+      "retailerId": "ret-canada-computers",
+      "slug": "cc-calgary",
+      "name": "Canada Computers Calgary",
+      "city": "Calgary",
+      "provinceCode": "AB",
+      "countryCode": "CA",
+      "latitude": 51.0447,
+      "longitude": -114.0719,
+      "createdAt": "2026-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "store-cc-edmonton",
+      "retailerId": "ret-canada-computers",
+      "slug": "cc-edmonton",
+      "name": "Canada Computers Edmonton",
+      "city": "Edmonton",
+      "provinceCode": "AB",
+      "countryCode": "CA",
+      "latitude": 53.5461,
+      "longitude": -113.4938,
       "createdAt": "2026-01-01T00:00:00.000Z"
     }
   ],
@@ -529,6 +608,36 @@
       "powerConnector": "8-pin",
       "createdAt": "2026-01-01T00:00:00.000Z",
       "updatedAt": "2026-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "card-msi-rtx-5070-ti-vcmsi00514-canada-computers",
+      "gpuId": "gpu-rtx-5070-ti",
+      "slug": "msi-rtx-5070-ti-vcmsi00514-canada-computers",
+      "brand": "MSI",
+      "modelName": "GeForce RTX 5070 Ti 16G VENTUS 3X PZ, 16GB GDDR7, Graphics card",
+      "vramGb": 16,
+      "lengthMm": null,
+      "slotWidth": null,
+      "cooling": null,
+      "psuWatts": null,
+      "powerConnector": null,
+      "createdAt": "2026-01-01T00:00:00.000Z",
+      "updatedAt": "2026-11-23T10:11:10.971Z"
+    },
+    {
+      "id": "card-zotac-rtx-5060-vczot00281ob-canada-computers",
+      "gpuId": "gpu-rtx-5060",
+      "slug": "zotac-rtx-5060-vczot00281ob-canada-computers",
+      "brand": "ZOTAC",
+      "modelName": "GAMING GeForce RTX 5060 AMP 8GB GDDR7(Open Box)",
+      "vramGb": 8,
+      "lengthMm": null,
+      "slotWidth": null,
+      "cooling": null,
+      "psuWatts": null,
+      "powerConnector": null,
+      "createdAt": "2026-01-01T00:00:00.000Z",
+      "updatedAt": "2026-11-23T10:11:18.410Z"
     }
   ],
   "offers": [
@@ -543,6 +652,7 @@
       "brand": "ZOTAC",
       "variantLabel": "Twin Edge OC",
       "condition": "new",
+      "isPlaceholder": true,
       "createdAt": "2026-11-23T08:00:00.000Z",
       "updatedAt": "2026-11-23T08:00:00.000Z"
     },
@@ -557,6 +667,7 @@
       "brand": "PNY",
       "variantLabel": "Slim OC Dual-Fan",
       "condition": "new",
+      "isPlaceholder": true,
       "createdAt": "2026-11-23T09:00:00.000Z",
       "updatedAt": "2026-11-23T09:00:00.000Z"
     },
@@ -571,22 +682,9 @@
       "brand": "PNY",
       "variantLabel": "XLR8 Gaming VERTO OC",
       "condition": "new",
+      "isPlaceholder": true,
       "createdAt": "2026-11-23T07:00:00.000Z",
       "updatedAt": "2026-11-23T07:00:00.000Z"
-    },
-    {
-      "id": "offer-canada-computers-cc-markham-ex-cc-5080",
-      "gpuId": "gpu-rtx-5080",
-      "cardId": "card-msi-5080-ventus",
-      "retailerId": "ret-canada-computers",
-      "storeId": "store-cc-markham",
-      "sku": "EX-CC-5080",
-      "productUrl": "https://example.invalid/cc/5080",
-      "brand": "MSI",
-      "variantLabel": "VENTUS 3X OC",
-      "condition": "new",
-      "createdAt": "2026-11-22T15:00:00.000Z",
-      "updatedAt": "2026-11-22T15:00:00.000Z"
     },
     {
       "id": "offer-amazon-ca-online-ex-amz-5080",
@@ -599,6 +697,7 @@
       "brand": "MSI",
       "variantLabel": "VENTUS 3X OC",
       "condition": "new",
+      "isPlaceholder": true,
       "createdAt": "2026-11-23T06:00:00.000Z",
       "updatedAt": "2026-11-23T06:00:00.000Z"
     },
@@ -613,6 +712,7 @@
       "brand": "NVIDIA",
       "variantLabel": "Founders Edition 32GB",
       "condition": "new",
+      "isPlaceholder": true,
       "createdAt": "2026-11-23T05:00:00.000Z",
       "updatedAt": "2026-11-23T05:00:00.000Z"
     },
@@ -627,6 +727,7 @@
       "brand": "ASUS",
       "variantLabel": "TUF Gaming OC",
       "condition": "new",
+      "isPlaceholder": true,
       "createdAt": "2026-11-22T20:00:00.000Z",
       "updatedAt": "2026-11-22T20:00:00.000Z"
     },
@@ -641,6 +742,7 @@
       "brand": "ASUS",
       "variantLabel": "TUF Gaming OC",
       "condition": "new",
+      "isPlaceholder": true,
       "createdAt": "2026-11-23T04:00:00.000Z",
       "updatedAt": "2026-11-23T04:00:00.000Z"
     },
@@ -655,6 +757,7 @@
       "brand": "MSI",
       "variantLabel": "VENTUS 2X OC 8GB",
       "condition": "new",
+      "isPlaceholder": true,
       "createdAt": "2026-11-21T14:00:00.000Z",
       "updatedAt": "2026-11-21T14:00:00.000Z"
     },
@@ -669,22 +772,9 @@
       "brand": "Palit",
       "variantLabel": "StormX",
       "condition": "new",
+      "isPlaceholder": true,
       "createdAt": "2026-11-22T11:00:00.000Z",
       "updatedAt": "2026-11-22T11:00:00.000Z"
-    },
-    {
-      "id": "offer-canada-computers-cc-vancouver-ex-cc-5070ti",
-      "gpuId": "gpu-rtx-5070-ti",
-      "cardId": "card-msi-5070ti-ventus",
-      "retailerId": "ret-canada-computers",
-      "storeId": "store-cc-vancouver",
-      "sku": "EX-CC-5070TI",
-      "productUrl": "https://example.invalid/cc/5070ti",
-      "brand": "MSI",
-      "variantLabel": "VENTUS 2X OC",
-      "condition": "new",
-      "createdAt": "2026-11-23T03:00:00.000Z",
-      "updatedAt": "2026-11-23T03:00:00.000Z"
     },
     {
       "id": "offer-visions-online-ex-vi-4060",
@@ -697,6 +787,7 @@
       "brand": "ASUS",
       "variantLabel": "Dual OC",
       "condition": "new",
+      "isPlaceholder": true,
       "createdAt": "2026-11-19T16:00:00.000Z",
       "updatedAt": "2026-11-19T16:00:00.000Z"
     },
@@ -711,6 +802,7 @@
       "brand": "PNY",
       "variantLabel": "RTX PRO 5000",
       "condition": "new",
+      "isPlaceholder": true,
       "createdAt": "2026-11-18T10:00:00.000Z",
       "updatedAt": "2026-11-18T10:00:00.000Z"
     },
@@ -725,22 +817,9 @@
       "brand": "NVIDIA",
       "variantLabel": "RTX PRO 4000",
       "condition": "new",
+      "isPlaceholder": true,
       "createdAt": "2026-11-17T09:00:00.000Z",
       "updatedAt": "2026-11-17T09:00:00.000Z"
-    },
-    {
-      "id": "offer-canada-computers-cc-markham-ex-cc-5060ti16-ob",
-      "gpuId": "gpu-rtx-5060-ti-16",
-      "cardId": "card-asus-5060ti16-dual",
-      "retailerId": "ret-canada-computers",
-      "storeId": "store-cc-markham",
-      "sku": "EX-CC-5060TI16-OB",
-      "productUrl": "https://example.invalid/cc/5060ti-ob",
-      "brand": "ASUS",
-      "variantLabel": "Dual OC 16GB",
-      "condition": "open_box",
-      "createdAt": "2026-11-22T18:00:00.000Z",
-      "updatedAt": "2026-11-22T18:00:00.000Z"
     },
     {
       "id": "offer-best-buy-ca-bb-vancouver-ex-bb-5080-ob",
@@ -753,108 +832,139 @@
       "brand": "Gigabyte",
       "variantLabel": "WINDFORCE OC",
       "condition": "open_box",
+      "isPlaceholder": true,
       "createdAt": "2026-11-21T13:00:00.000Z",
       "updatedAt": "2026-11-21T13:00:00.000Z"
+    },
+    {
+      "id": "offer-canada-computers-online-vcmsi00514",
+      "gpuId": "gpu-rtx-5070-ti",
+      "cardId": "card-msi-rtx-5070-ti-vcmsi00514-canada-computers",
+      "retailerId": "ret-canada-computers",
+      "storeId": null,
+      "sku": "VCMSI00514",
+      "productUrl": "/internal/cc/VCMSI00514",
+      "brand": "MSI",
+      "variantLabel": "GeForce RTX 5070 Ti 16G VENTUS 3X PZ, 16GB GDDR7, Graphics card",
+      "condition": "open_box",
+      "isPlaceholder": false,
+      "createdAt": "2026-11-23T10:11:10.971Z",
+      "updatedAt": "2026-11-23T10:11:10.971Z"
+    },
+    {
+      "id": "offer-canada-computers-online-vczot00281ob",
+      "gpuId": "gpu-rtx-5060",
+      "cardId": "card-zotac-rtx-5060-vczot00281ob-canada-computers",
+      "retailerId": "ret-canada-computers",
+      "storeId": null,
+      "sku": "VCZOT00281OB",
+      "productUrl": "/internal/cc/VCZOT00281OB",
+      "brand": "ZOTAC",
+      "variantLabel": "GAMING GeForce RTX 5060 AMP 8GB GDDR7(Open Box)",
+      "condition": "open_box",
+      "isPlaceholder": false,
+      "createdAt": "2026-11-23T10:11:18.410Z",
+      "updatedAt": "2026-11-23T10:11:18.410Z"
     }
   ],
   "priceObservations": [
     {
-      "id": "obs-offer-best-buy-ca-bb-yonge-ex-bb-5070-zt-0",
+      "id": "obs-offer-canada-computers-online-vcmsi00514-0",
+      "offerId": "offer-canada-computers-online-vcmsi00514",
+      "priceCad": 1989.99,
+      "inStock": false,
+      "observedAt": "2026-11-23T10:11:10.971Z"
+    },
+    {
+      "id": "obs-offer-canada-computers-online-vczot00281ob-1",
+      "offerId": "offer-canada-computers-online-vczot00281ob",
+      "priceCad": 636.49,
+      "inStock": false,
+      "observedAt": "2026-11-23T10:11:18.410Z"
+    },
+    {
+      "id": "obs-offer-best-buy-ca-bb-yonge-ex-bb-5070-zt-2",
       "offerId": "offer-best-buy-ca-bb-yonge-ex-bb-5070-zt",
       "priceCad": 829.99,
       "inStock": true,
       "observedAt": "2026-11-23T08:00:00.000Z"
     },
     {
-      "id": "obs-offer-best-buy-ca-bb-yonge-ex-bb-5070-zt-1",
+      "id": "obs-offer-best-buy-ca-bb-yonge-ex-bb-5070-zt-3",
       "offerId": "offer-best-buy-ca-bb-yonge-ex-bb-5070-zt",
       "priceCad": 849.99,
       "inStock": true,
       "observedAt": "2026-11-10T18:00:00.000Z"
     },
     {
-      "id": "obs-offer-best-buy-ca-bb-yonge-ex-bb-5070-zt-2",
+      "id": "obs-offer-best-buy-ca-bb-yonge-ex-bb-5070-zt-4",
       "offerId": "offer-best-buy-ca-bb-yonge-ex-bb-5070-zt",
       "priceCad": 839.99,
       "inStock": false,
       "observedAt": "2026-11-15T18:00:00.000Z"
     },
     {
-      "id": "obs-offer-memory-express-me-calgary-ex-me-5070-slim-3",
+      "id": "obs-offer-memory-express-me-calgary-ex-me-5070-slim-5",
       "offerId": "offer-memory-express-me-calgary-ex-me-5070-slim",
       "priceCad": 870,
       "inStock": true,
       "observedAt": "2026-11-23T09:00:00.000Z"
     },
     {
-      "id": "obs-offer-newegg-ca-online-ex-ne-5070ti-4",
+      "id": "obs-offer-newegg-ca-online-ex-ne-5070ti-6",
       "offerId": "offer-newegg-ca-online-ex-ne-5070ti",
       "priceCad": 1440,
       "inStock": true,
       "observedAt": "2026-11-23T07:00:00.000Z"
     },
     {
-      "id": "obs-offer-newegg-ca-online-ex-ne-5070ti-5",
+      "id": "obs-offer-newegg-ca-online-ex-ne-5070ti-7",
       "offerId": "offer-newegg-ca-online-ex-ne-5070ti",
       "priceCad": 1461,
       "inStock": true,
       "observedAt": "2026-11-20T12:00:00.000Z"
     },
     {
-      "id": "obs-offer-canada-computers-cc-markham-ex-cc-5080-6",
-      "offerId": "offer-canada-computers-cc-markham-ex-cc-5080",
-      "priceCad": 2000,
-      "inStock": true,
-      "observedAt": "2026-11-22T15:00:00.000Z"
-    },
-    {
-      "id": "obs-offer-amazon-ca-online-ex-amz-5080-7",
+      "id": "obs-offer-amazon-ca-online-ex-amz-5080-8",
       "offerId": "offer-amazon-ca-online-ex-amz-5080",
       "priceCad": 2348,
       "inStock": true,
       "observedAt": "2026-11-23T06:00:00.000Z"
     },
     {
-      "id": "obs-offer-newegg-ca-online-ex-ne-5090-8",
+      "id": "obs-offer-newegg-ca-online-ex-ne-5090-9",
       "offerId": "offer-newegg-ca-online-ex-ne-5090",
       "priceCad": 6450,
       "inStock": true,
       "observedAt": "2026-11-23T05:00:00.000Z"
     },
     {
-      "id": "obs-offer-ebay-ca-online-ex-eb-5090-9",
+      "id": "obs-offer-ebay-ca-online-ex-eb-5090-10",
       "offerId": "offer-ebay-ca-online-ex-eb-5090",
       "priceCad": 6500,
       "inStock": true,
       "observedAt": "2026-11-22T20:00:00.000Z"
     },
     {
-      "id": "obs-offer-memory-express-me-edmonton-ex-me-5060-10",
+      "id": "obs-offer-memory-express-me-edmonton-ex-me-5060-11",
       "offerId": "offer-memory-express-me-edmonton-ex-me-5060",
       "priceCad": 490,
       "inStock": true,
       "observedAt": "2026-11-23T04:00:00.000Z"
     },
     {
-      "id": "obs-offer-walmart-ca-online-ex-wm-5060ti8-11",
+      "id": "obs-offer-walmart-ca-online-ex-wm-5060ti8-12",
       "offerId": "offer-walmart-ca-online-ex-wm-5060ti8",
       "priceCad": 490,
       "inStock": true,
       "observedAt": "2026-11-21T14:00:00.000Z"
     },
     {
-      "id": "obs-offer-staples-ca-online-ex-st-5050-12",
+      "id": "obs-offer-staples-ca-online-ex-st-5050-13",
       "offerId": "offer-staples-ca-online-ex-st-5050",
       "priceCad": 390,
       "inStock": true,
       "observedAt": "2026-11-22T11:00:00.000Z"
-    },
-    {
-      "id": "obs-offer-canada-computers-cc-vancouver-ex-cc-5070ti-13",
-      "offerId": "offer-canada-computers-cc-vancouver-ex-cc-5070ti",
-      "priceCad": 1300,
-      "inStock": true,
-      "observedAt": "2026-11-23T03:00:00.000Z"
     },
     {
       "id": "obs-offer-visions-online-ex-vi-4060-14",
@@ -878,14 +988,7 @@
       "observedAt": "2026-11-17T09:00:00.000Z"
     },
     {
-      "id": "obs-offer-canada-computers-cc-markham-ex-cc-5060ti16-ob-17",
-      "offerId": "offer-canada-computers-cc-markham-ex-cc-5060ti16-ob",
-      "priceCad": 720,
-      "inStock": true,
-      "observedAt": "2026-11-22T18:00:00.000Z"
-    },
-    {
-      "id": "obs-offer-best-buy-ca-bb-vancouver-ex-bb-5080-ob-18",
+      "id": "obs-offer-best-buy-ca-bb-vancouver-ex-bb-5080-ob-17",
       "offerId": "offer-best-buy-ca-bb-vancouver-ex-bb-5080-ob",
       "priceCad": 1849,
       "inStock": true,
@@ -1009,6 +1112,28 @@
       "provinceName": "Quebec",
       "taxLabel": "GST+QST ~14.98%",
       "taxRate": 0.1498
+    }
+  ],
+  "ingestLogs": [
+    {
+      "retailerId": "pc-canada",
+      "fetched": 0,
+      "skipped": 0,
+      "challenged": true,
+      "message": "robots.txt challenge on https://www.pc-canada.com (403)"
+    },
+    {
+      "retailerId": "mikes-computer-shop",
+      "fetched": 0,
+      "skipped": 0,
+      "challenged": true,
+      "message": "Bot challenge on www.mikescomputershop.com for /product/msi_geforce_rtx_5070_ventus_2x_oc_12gb/83036 (403)"
+    },
+    {
+      "retailerId": "canada-computers-live",
+      "fetched": 2,
+      "skipped": 0,
+      "challenged": false
     }
   ]
 }

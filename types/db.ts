@@ -71,7 +71,8 @@ export interface Offer {
   brand: string;
   variantLabel: string | null;
   condition: OfferCondition;
-  isPlaceholder?: boolean;
+  /** False when price/stock comes from a cleared live ingester. */
+  isPlaceholder: boolean;
   createdAt: string;
   updatedAt: string;
 }
@@ -122,9 +123,19 @@ export interface PriceAlert {
 }
 
 /** JSON store written by ingester (placeholder until DB is wired up). */
+export interface IngestRunLogEntry {
+  retailerId: string;
+  fetched: number;
+  skipped: number;
+  challenged: boolean;
+  message?: string;
+}
+
 export interface TrackerStore {
   version: 2;
+  /** True when any offer still uses placeholder/example pricing. */
   placeholder: boolean;
+  liveOfferCount: number;
   generatedAt: string;
   gpus: Gpu[];
   retailers: Retailer[];
@@ -134,4 +145,5 @@ export interface TrackerStore {
   priceObservations: PriceObservation[];
   changeEvents: ChangeEvent[];
   provinceTaxes: ProvinceTax[];
+  ingestLogs?: IngestRunLogEntry[];
 }

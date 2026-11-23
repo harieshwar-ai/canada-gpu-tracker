@@ -10,6 +10,7 @@ import type {
   OfferCondition,
 } from "../../../types/db";
 import storeJson from "../../../data/store.json";
+import { formatOfferLocation } from "./format";
 
 const store = storeJson as TrackerStore;
 
@@ -24,6 +25,10 @@ function latestByOffer(): Map<string, PriceObservation> {
     if (!prev || obs.observedAt > prev.observedAt) latest.set(obs.offerId, obs);
   }
   return latest;
+}
+
+export function isLiveOffer(o: Offer): boolean {
+  return o.isPlaceholder === false;
 }
 
 export function getGpuMap() {
@@ -74,21 +79,103 @@ export interface SiteStats {
 export function getSiteStats(): SiteStats {
   const latest = latestByOffer();
   let offersInStock = 0;
-  for (const obs of latest.values()) {
-    if (obs.inStock) offersInStock++;
+  const retailerIds = new Set<string>();
+  const storeIds = new Set<string>();
+  const cardIds = new Set<string>();
+
+  for (const o of store.offers) {
+    if (!isLiveOffer(o)) continue;
+    const obs = latest.get(o.id);
+    if (!obs?.inStock) continue;
+    offersInStock++;
+    retailerIds.add(o.retailerId);
+    if (o.storeId) storeIds.add(o.storeId);
+    cardIds.add(o.cardId);
   }
+
   return {
-    cardsTracked: store.cards.length,
-    stores: store.stores.length,
+    cardsTracked: cardIds.size,
+    stores: storeIds.size,
     offersInStock,
-    retailers: store.retailers.length,
+    retailers: retailerIds.size,
   };
 }
 
 export function getLiveChanges(limit = 8): ChangeEvent[] {
-  return [...store.changeEvents]
+  return store.changeEvents
+    .filter((ev) => {
+      if (!ev.offerId) return true;
+      const offer = store.offers.find((o) => o.id === ev.offerId);
+      return offer ? isLiveOffer(offer) : true;
+    })
     .sort((a, b) => b.occurredAt.localeCompare(a.occurredAt))
     .slice(0, limit);
+}
+
+export interface LiveActivityItem {
+  kind: "change" | "first_seen";
+  title: string;
+  detail: string;
+  href: string;
+  occurredAt: string;
+}
+
+/** Headline live feed: change events, else first observations for live offers. */
+export function getLiveActivity(limit = 8): LiveActivityItem[] {
+  const cardMap = getCardMap();
+  const retailerMap = getRetailerMap();
+  const items: LiveActivityItem[] = [];
+
+  for (const ev of getLiveChanges(limit * 2)) {
+    const card = cardMap.get(ev.cardId);
+    if (!card) continue;
+    let detail = "";
+    if (ev.eventType === "price_drop" && ev.priceCad != null) {
+      detail = `Price drop · $${ev.priceCad.toFixed(2)} CAD`;
+    } else if (ev.eventType === "in_stock") {
+      detail = "Back in stock";
+    } else {
+      detail = "Sold out";
+    }
+    items.push({
+      kind: "change",
+      title: `${card.brand} ${card.modelName}`,
+      detail,
+      href: `/cards/${card.slug}/`,
+      occurredAt: ev.occurredAt,
+    });
+  }
+
+  if (items.length < limit) {
+    const latest = latestByOffer();
+    const seenOffers = new Set<string>();
+    const seenCards = new Set<string>();
+    for (const o of store.offers) {
+      if (!isLiveOffer(o) || seenOffers.has(o.id) || seenCards.has(o.cardId))
+        continue;
+      const obs = latest.get(o.id);
+      if (!obs) continue;
+      const card = cardMap.get(o.cardId);
+      const retailer = retailerMap.get(o.retailerId);
+      if (!card || !retailer) continue;
+      const first = [...store.priceObservations]
+        .filter((p) => p.offerId === o.id)
+        .sort((a, b) => a.observedAt.localeCompare(b.observedAt))[0];
+      if (!first) continue;
+      seenOffers.add(o.id);
+      seenCards.add(o.cardId);
+      items.push({
+        kind: "first_seen",
+        title: `${card.brand} ${card.modelName}`,
+        detail: `First seen · $${first.priceCad.toFixed(2)} CAD · ${retailer.name}`,
+        href: `/cards/${card.slug}/`,
+        occurredAt: first.observedAt,
+      });
+    }
+    items.sort((a, b) => b.occurredAt.localeCompare(a.occurredAt));
+  }
+
+  return items.slice(0, limit);
 }
 
 export interface GpuLaunchRow {
@@ -102,13 +189,13 @@ export interface GpuLaunchRow {
 
 export function getLaunchPriceGrid(): GpuLaunchRow[] {
   const latest = latestByOffer();
-  const cardMap = getCardMap();
-  const storeMap = getStoreMap();
 
   return getGeForce50Gpus().map((gpu) => {
-    const gpuCards = store.cards.filter((c) => c.gpuId === gpu.id);
-    const gpuOffers = store.offers.filter((o) => o.gpuId === gpu.id);
-    const inStockOffers = gpuOffers.filter(
+    const liveOffers = store.offers.filter(
+      (o) => o.gpuId === gpu.id && isLiveOffer(o)
+    );
+    const liveCardIds = new Set(liveOffers.map((o) => o.cardId));
+    const inStockOffers = liveOffers.filter(
       (o) => latest.get(o.id)?.inStock && o.condition === "new"
     );
     let cheapest: number | null = null;
@@ -132,7 +219,7 @@ export function getLaunchPriceGrid(): GpuLaunchRow[] {
       pctOverMsrp,
       storesInStock: storeIds.size,
       cardsInStock: cardIdsInStock.size,
-      cardsTotal: gpuCards.length,
+      cardsTotal: liveCardIds.size,
     };
   });
 }
@@ -160,7 +247,7 @@ export function getCheapestPerGpu(): CheapestGpuRow[] {
 
   return getGeForce50Gpus().map((gpu) => {
     const offers = store.offers.filter(
-      (o) => o.gpuId === gpu.id && o.condition === "new"
+      (o) => o.gpuId === gpu.id && o.condition === "new" && isLiveOffer(o)
     );
     let best: { card: Card; price: number; retailer: Retailer } | null = null;
     const chips: RetailerChip[] = [];
@@ -222,6 +309,7 @@ export function getFreshFinds(tab: FreshTab): FreshFind[] {
 
   const items: FreshFind[] = [];
   for (const o of store.offers) {
+    if (!isLiveOffer(o)) continue;
     const obs = latest.get(o.id);
     if (!obs) continue;
     const card = cardMap.get(o.cardId);
@@ -327,7 +415,7 @@ export function getPriceHistoryForCard(cardId: string) {
     const retailer = retailerMap.get(offer.retailerId);
     const st = offer.storeId ? storeMap.get(offer.storeId) : null;
     const label = st
-      ? `${retailer?.name} · ${st.city}`
+      ? `${retailer?.name} · ${formatOfferLocation(st)}`
       : retailer?.name ?? "Offer";
     return {
       offerId: offer.id,
