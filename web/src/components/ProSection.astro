@@ -12,7 +12,7 @@ const proGpus = getProGpus();
       const cards = getAllCards().filter((c) => c.gpuId === gpu.id);
       const cheapest = cards
         .flatMap((c) => getOffersForCard(c.id))
-        .filter((o) => o.latest?.inStock)
+        .filter((o) => o.offer.isPlaceholder !== true && o.latest?.inStock)
         .sort((a, b) => (a.latest!.priceCad) - (b.latest!.priceCad))[0];
       return (
         <a href={`/gpu/${gpu.slug}/`} class="card pro-card">
