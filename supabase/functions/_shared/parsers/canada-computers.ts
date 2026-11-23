@@ -46,6 +46,30 @@ function parseStoreStock(html: string): ParsedStoreStock[] {
   return stocks;
 }
 
+/** Online ship stock from the Delivery panel — not store pickup counts. */
+function parseOnlineStockFromHtml(
+  html: string,
+  schemaAvailability: string | undefined
+): boolean {
+  const deliveryMatch = html.match(/id="delivery-text"[^>]*>\s*([^<]+)/i);
+  if (deliveryMatch) {
+    const text = deliveryMatch[1]!.trim().toLowerCase();
+    if (/sold\s+out\s+online/.test(text)) return false;
+    if (
+      /in\s+stock\s+online|available\s+online|ships\s+in|ready\s+to\s+ship/.test(
+        text
+      )
+    ) {
+      return true;
+    }
+  }
+  let inStockOnline = stockFromAvailability(schemaAvailability);
+  if (!inStockOnline && /product-available-for-order":true/.test(html)) {
+    inStockOnline = !/SoldOut/i.test(schemaAvailability ?? "");
+  }
+  return inStockOnline;
+}
+
 export function parseCanadaComputersProduct(
   html: string,
   url: string
@@ -82,12 +106,7 @@ export function parseCanadaComputersProduct(
         );
 
   const availability = offers?.availability as string | undefined;
-  let inStockOnline = stockFromAvailability(availability);
-  if (!inStockOnline && priceCad != null) {
-    if (/product-available-for-order":true/.test(html)) {
-      inStockOnline = !/SoldOut/i.test(availability ?? "");
-    }
-  }
+  const inStockOnline = parseOnlineStockFromHtml(html, availability);
 
   const sku =
     (product?.sku as string | undefined) ??
@@ -99,8 +118,6 @@ export function parseCanadaComputersProduct(
   const condition = openBox ? "open_box" : "new";
 
   const storeStock = parseStoreStock(html);
-  const anyStore = storeStock.some((s) => s.quantity > 0);
-  if (anyStore) inStockOnline = true;
 
   const variantLabel = title
     .replace(/\b(msi|asus|zotac|gigabyte|pny|palit|nvidia)\b/gi, "")
