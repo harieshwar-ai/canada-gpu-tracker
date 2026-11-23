@@ -6,3 +6,5 @@ web/.astro/
 *.log
 .env
 .env.*
+data/store.json
+data/ingest-state.json
