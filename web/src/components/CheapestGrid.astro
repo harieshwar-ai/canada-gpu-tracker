@@ -1,9 +1,12 @@
 ---
 import { getCheapestPerGpu } from "../lib/store";
+import { buildCardRows } from "../lib/catalog";
 import { formatCad } from "../lib/format";
 import { gpuUrl, cardUrl } from "../lib/routes";
+import Sparkline from "./ui/Sparkline.astro";
 
 const rows = getCheapestPerGpu();
+const sparkByCardId = new Map(buildCardRows().map((r) => [r.card.id, r.sparkline]));
 const retailerShort: Record<string, string> = {
   "Best Buy Canada": "BB",
   "Canada Computers": "CC",
@@ -16,34 +19,118 @@ const retailerShort: Record<string, string> = {
 ---
 
 <section class="section">
-  <h2 class="section-h">Cheapest in stock, per GPU</h2>
-  {rows.map((row) => (
-    <article class="cheap-row card">
-      <a href={gpuUrl(row.gpu.slug)} class="cheap-gpu">
-        <strong>{row.gpu.modelName.replace("GeForce ", "")}</strong>
-        <span class="spec-line">{row.specLine}</span>
-      </a>
-      <div class="cheap-price">
-        {row.cheapestPrice != null ? (
-          <>
-            <span class="big">{formatCad(row.cheapestPrice)}</span>
-            <span class="retailer">{row.retailer?.name}</span>
-            {row.pctOverMsrp != null && (
-              <span class="pct">{row.pctOverMsrp > 0 ? `+${row.pctOverMsrp}%` : `${row.pctOverMsrp}%`}</span>
-            )}
-          </>
-        ) : (
-          <span class="muted">No live prices yet</span>
-        )}
-      </div>
-      <div class="chips">
-        {row.chips.map((c) => (
-          <span class="chip">
-            {retailerShort[c.retailer.name] ?? c.retailer.name.slice(0, 4)}{" "}
-            {formatCad(c.priceCad)}
-          </span>
-        ))}
-      </div>
-    </article>
-  ))}
+  <div class="section-head">
+    <h2 class="section-h">Cheapest in stock, per GPU</h2>
+    <a href="/cards/?avail=stock" class="muted small">See all</a>
+  </div>
+  <form class="zip-row card" id="home-postal-form">
+    <span aria-hidden="true">📍</span>
+    <span class="muted small">Add a postal code to sort shelf stock by distance (km).</span>
+    <label class="visually-hidden" for="home-postal">Postal code</label>
+    <input type="text" id="home-postal" name="postal" placeholder="M5V 3A8" maxlength="7" autocomplete="postal-code" />
+    <button type="submit" class="btn-ghost">Set</button>
+  </form>
+  <div class="card-feed">
+    {rows.map((row) => {
+      const spark =
+        row.cheapestCard != null ? sparkByCardId.get(row.cheapestCard.id) ?? [] : [];
+      return (
+        <article class="offer-card">
+          <p class="eyebrow">
+            {row.gpu.modelName.replace("GeForce ", "")}
+            {row.cheapestCard ? ` · ${row.cheapestCard.brand}` : ""}
+          </p>
+          {row.cheapestCard ? (
+            <h3>
+              <a href={cardUrl(row.cheapestCard.slug)}>{row.cheapestCard.modelName}</a>
+            </h3>
+          ) : (
+            <h3>
+              <a href={gpuUrl(row.gpu.slug)}>{row.gpu.modelName.replace("GeForce ", "")}</a>
+            </h3>
+          )}
+          <p class="spec">{row.specLine}</p>
+          <div class="price-block">
+            <div class="left">
+              {row.cheapestPrice != null ? (
+                <>
+                  {formatCad(row.cheapestPrice)}
+                  <span class="muted small"> @ {row.retailer?.name}</span>
+                  {row.pctOverMsrp != null && (
+                    <span class={`pct small ${row.pctOverMsrp <= 0 ? "good" : ""}`}>
+                      {" "}
+                      {row.pctOverMsrp > 0 ? `+${row.pctOverMsrp}%` : `${row.pctOverMsrp}%`} MSRP
+                    </span>
+                  )}
+                </>
+              ) : (
+                <span class="muted">No live prices yet</span>
+              )}
+            </div>
+            {spark.length > 0 && <Sparkline prices={spark} />}
+          </div>
+          <div class="chips-row">
+            {row.chips.map((c) => (
+              <span class="chip">
+                {retailerShort[c.retailer.name] ?? c.retailer.name.slice(0, 4)}{" "}
+                {formatCad(c.priceCad)}
+              </span>
+            ))}
+          </div>
+        </article>
+      );
+    })}
+  </div>
 </section>
+
+<script>
+  const form = document.getElementById("home-postal-form") as HTMLFormElement;
+  const input = document.getElementById("home-postal") as HTMLInputElement;
+  try {
+    const prefs = JSON.parse(localStorage.getItem("cgt-prefs") || "{}");
+    if (prefs.postal) input.value = prefs.postal;
+  } catch {
+    /* ignore */
+  }
+  form?.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const postal = input.value.trim().toUpperCase();
+    try {
+      const prefs = JSON.parse(localStorage.getItem("cgt-prefs") || "{}");
+      prefs.postal = postal;
+      localStorage.setItem("cgt-prefs", JSON.stringify(prefs));
+    } catch {
+      localStorage.setItem("cgt-prefs", JSON.stringify({ postal }));
+    }
+    window.location.href = "/preferences/#location";
+  });
+</script>
+
+<style>
+  .section-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.75rem;
+    margin-bottom: 0.65rem;
+  }
+  .section-h {
+    margin: 0;
+  }
+  .visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    border: 0;
+  }
+  .pct.good {
+    color: var(--down);
+  }
+  .pct:not(.good) {
+    color: var(--up-bad);
+  }
+</style>

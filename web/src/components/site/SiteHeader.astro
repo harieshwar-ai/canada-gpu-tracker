@@ -19,14 +19,17 @@ const brands = ["ASUS", "MSI", "Gigabyte", "PNY", "ZOTAC", "NVIDIA", "Palit"];
       <kbd>/</kbd>
     </form>
     <div class="topbar-actions">
-      <a href="/preferences/" class="btn-ghost">Preferences</a>
-      <a href="/preferences/#location" class="btn-ghost location-chip">📍 Postal</a>
+      <a href="/preferences/" class="btn-ghost hide-sm">Preferences</a>
+      <a href="/preferences/#location" class="btn-ghost location-chip hide-sm">📍 Postal</a>
       <button type="button" class="btn-ghost" id="theme-toggle" aria-label="Switch theme">Theme</button>
-      <a href="/alerts/" class="btn-ghost">Alerts</a>
+      <a href="/alerts/" class="btn-ghost hide-sm">Alerts</a>
+      <button type="button" class="btn-ghost menu-btn" id="nav-open" aria-expanded="false" aria-controls="mobile-drawer">
+        Menu
+      </button>
     </div>
   </div>
   <nav class="main-nav" aria-label="Main">
-    <div class="nav-inner nav-scroll">
+    <div class="nav-inner nav-scroll desktop-only">
       <details class="nav-dd">
         <summary>GPUs</summary>
         <div class="dd-panel">
@@ -42,6 +45,9 @@ const brands = ["ASUS", "MSI", "Gigabyte", "PNY", "ZOTAC", "NVIDIA", "Palit"];
           {pro.map((g) => (
             <a href={gpuUrl(g.slug)}>{g.modelName}</a>
           ))}
+          <a href="/gpus/series/geforce-50/">50 series hub</a>
+          <a href="/gpus/series/geforce-40/">40 series hub</a>
+          <a href="/gpus/series/rtx-pro/">RTX PRO hub</a>
           <a href="/gpus/">All GPUs</a>
         </div>
       </details>
@@ -64,6 +70,32 @@ const brands = ["ASUS", "MSI", "Gigabyte", "PNY", "ZOTAC", "NVIDIA", "Palit"];
       </span>
     </div>
   </nav>
+  <div id="mobile-drawer" class="mobile-drawer" role="dialog" aria-modal="true" aria-label="Site menu" hidden>
+    <div class="drawer-head">
+      <strong>Menu</strong>
+      <button type="button" class="btn-ghost" id="nav-close" aria-label="Close menu">Close</button>
+    </div>
+    <div class="drawer-body">
+      <a href="/gpus/">GPUs</a>
+      <a href="/gpus/series/geforce-50/">GeForce 50 series</a>
+      <a href="/gpus/series/geforce-40/">GeForce 40 series</a>
+      <a href="/cards/">All cards</a>
+      <a href="/cards/?avail=stock">In stock now</a>
+      <a href="/deals/">Deals</a>
+      <a href="/open-box/">Open box</a>
+      <a href="/near/">Near me</a>
+      <a href="/finder/">Finder</a>
+      <a href="/compare/">Compare</a>
+      <a href="/stores/">Stores</a>
+      <a href="/preferences/">Preferences</a>
+      <a href="/alerts/">Alerts</a>
+      <p class="dd-label">Brands</p>
+      {brands.map((b) => (
+        <a href={`/brands/${b.toLowerCase()}/`}>{b}</a>
+      ))}
+    </div>
+  </div>
+  <div class="drawer-backdrop" id="drawer-backdrop" hidden></div>
 </header>
 
 <script>
@@ -83,6 +115,21 @@ const brands = ["ASUS", "MSI", "Gigabyte", "PNY", "ZOTAC", "NVIDIA", "Palit"];
       input?.focus();
     }
   });
+  const drawer = document.getElementById("mobile-drawer");
+  const backdrop = document.getElementById("drawer-backdrop");
+  const openBtn = document.getElementById("nav-open");
+  const closeBtn = document.getElementById("nav-close");
+  function setDrawer(open: boolean) {
+    if (!drawer || !backdrop || !openBtn) return;
+    drawer.hidden = !open;
+    backdrop.hidden = !open;
+    openBtn.setAttribute("aria-expanded", open ? "true" : "false");
+    document.body.style.overflow = open ? "hidden" : "";
+  }
+  openBtn?.addEventListener("click", () => setDrawer(true));
+  closeBtn?.addEventListener("click", () => setDrawer(false));
+  backdrop?.addEventListener("click", () => setDrawer(false));
+  drawer?.querySelectorAll("a").forEach((a) => a.addEventListener("click", () => setDrawer(false)));
 </script>
 
 <style>
@@ -130,5 +177,70 @@ const brands = ["ASUS", "MSI", "Gigabyte", "PNY", "ZOTAC", "NVIDIA", "Palit"];
     font-size: 0.68rem;
     text-transform: uppercase;
     color: var(--dim);
+  }
+  .menu-btn {
+    display: inline-flex;
+  }
+  .mobile-drawer {
+    position: fixed;
+    top: 0;
+    right: 0;
+    z-index: 80;
+    width: min(88vw, 320px);
+    height: 100vh;
+    background: var(--bg-elevated);
+    border-left: 1px solid var(--border);
+    padding: 1rem;
+    overflow: auto;
+    box-shadow: -8px 0 24px rgba(0, 0, 0, 0.35);
+  }
+  .drawer-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.75rem;
+  }
+  .drawer-body {
+    display: grid;
+    gap: 0.35rem;
+  }
+  .drawer-body a {
+    padding: 0.45rem 0.35rem;
+    border-radius: 6px;
+    color: var(--text);
+    text-decoration: none;
+    font-size: 0.92rem;
+  }
+  .drawer-body a:hover {
+    background: var(--surface-hover);
+  }
+  .drawer-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 70;
+    background: rgba(0, 0, 0, 0.55);
+  }
+  @media (min-width: 900px) {
+    .menu-btn,
+    .mobile-drawer,
+    .drawer-backdrop {
+      display: none !important;
+    }
+  }
+  @media (max-width: 899px) {
+    .desktop-only {
+      display: none;
+    }
+    .hide-sm {
+      display: none;
+    }
+    .topbar-actions {
+      gap: 0.35rem;
+    }
+    .search-wrap {
+      order: 3;
+      flex-basis: 100%;
+      max-width: none;
+    }
   }
 </style>

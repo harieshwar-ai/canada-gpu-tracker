@@ -4,10 +4,11 @@ Spec: [`rtx-live-spec.md`](./rtx-live-spec.md) · Reference shots: `reference/rt
 
 | Area | Status | Notes |
 |------|--------|-------|
-| Global chrome 1.1–1.6 | [x] | Dark theme, search `/`, nav dropdowns, footer; mobile drawer [~] |
-| Home 2.1–2.9 | [x] | Hero split, live feed, MSRP grid + meter, fresh tabs, FAQ `<details>` |
+| Global chrome 1.1–1.6 | [x] | Dark theme, search `/`, nav dropdowns, footer; **mobile drawer** |
+| Home 2.1–2.9 | [x] | Hero split, live feed, MSRP grid + meter, fresh tabs, FAQ; **postal row + sparklines on cheapest cards** |
 | GPUs / series | [x] | `/gpus/`, `/gpus/geforce-rtx-*` |
-| GPU detail | [x] | Stats row, sortable table, sparklines, $/GB + % MSRP |
+| GPU detail | [x] | Stats row, sortable table, sparklines, $/GB + % MSRP; **brand/in-stock sidebar**; shelf list |
+| Series hubs | [x] | `/gpus/series/geforce-50|geforce-40|rtx-pro` |
 | Card detail | [x] | Offers, tax hint, chart, alert stub link |
 | All cards | [x] | `/cards/` filters + sorts incl. $/GB |
 | Deals / drops / open box / near | [x] | Dedicated routes |

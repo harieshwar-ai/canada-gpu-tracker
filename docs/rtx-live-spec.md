@@ -39,7 +39,7 @@
 | 1.1 | **Skip link** | Visually hidden → `#main` | Focus reveals link | — | home-* | Same | [x] |
 | 1.2 | **Top bar** | Logo, “Other trackers” menu, YouTube Live link, **Search** (`/` shortcut), Preferences, **Location (ZIP)**, theme toggle, Sign in / Create account | Search typing filters/navigates to cards; location modal sets ZIP; theme toggles light/dark | `/preferences`, `/auth/*` | `home-desktop-1440.png`, `home-theme-light-desktop-1440.png` | Logo **Canada GPU Tracker**; Live link optional stub; **Postal code** not ZIP; Preferences → `/preferences`; no account required for browse | [x] |
 | 1.3 | **Main nav** | GPUs ▾, Brands ▾, All cards, In stock now, Build a PC (external), Deals, Finder, Compare, Stores; trailing meta “Live prices · N stores · N retailers” | GPU/Brand buttons open **dropdown panels** (grid of links); links navigate | See §4–§12 | `nav-gpu-dropdown-desktop-1440.png`, `nav-brand-dropdown-desktop-1440.png` | Replace MC/BB/CC with **Canada Computers, Memory Express, Best Buy CA**; drop rigs.live or link stub; same nav labels | [x] |
-| 1.4 | **Mobile nav** | Hamburger / condensed header | Opens drawer or stacked nav | — | `mobile-header-mobile-390.png` | Same pattern | [~] |
+| 1.4 | **Mobile nav** | Hamburger / condensed header | Opens drawer or stacked nav | — | `mobile-header-mobile-390.png` | Same pattern | [x] |
 | 1.5 | **Footer** | “Follow the finds” (Telegram, YouTube, Discord), site stats, multi-column links (Shop, GPUs, Resources), legal | All links outbound or internal | `/price-drops`, `/open-box`, `/near`, etc. | home full-page | Contact **harieshwar.dev@gmail.com**; Canadian social TBD; footer links to our routes | [x] |
 | 1.6 | **Breadcrumbs** | Home → section → entity | On GPU, card, preferences, store pages | — | `gpu-5070-desktop-1440.png`, `preferences-desktop-1440.png` | Home → GPUs → series → model | [x] |
 
@@ -54,7 +54,7 @@
 | 2.3 | **Live changes (right panel)** | H2 + optional YouTube link; list rows: icon (drop / in stock / sold out), card title, meta (delta or status · retailer logo · city · time ago), right-aligned price | Each row links to **card page** | — | same | Cities **Canadian**; prices **CAD**; retailer names | [x] |
 | 2.4 | **Retailer strip** | Pills/logos per retailer (MC, BB, …) | Links to `/cards?sold_at={retailer}` | `?sold_at=` | same | CC, ME, BB, Newegg.ca, Amazon.ca, etc. | [x] |
 | 2.5 | **GeForce 50 vs launch** | Section head + “All GPUs”; grid of GPU tiles: name, VRAM · MSRP, store count badge, lowest price, **% vs MSRP**, **MSRP meter bar** (0–2.5×), “N/M cards in stock” | Tile → `/gpus/{slug}` | `/gpus` | same | **Launch MSRP CAD** (NVIDIA CA); meter uses CAD | [x] |
-| 2.6 | **Cheapest in stock, per GPU** | Section + “See all”; **ZIP prompt row** (icon, copy, input, Set); feed of **offer cards**: eyebrow (GPU · variant line), card name, spec line, price + retailer, % vs MSRP, **retailer price chips**, optional sparkline | ZIP submit sets location preference; chips link or informational | `/cards?avail=stock` | same | **Postal code + km**; chips show Canadian retailers | [~] |
+| 2.6 | **Cheapest in stock, per GPU** | Section + “See all”; **ZIP prompt row** (icon, copy, input, Set); feed of **offer cards**: eyebrow (GPU · variant line), card name, spec line, price + retailer, % vs MSRP, **retailer price chips**, optional sparkline | ZIP submit sets location preference; chips link or informational | `/cards?avail=stock` | same | **Postal code + km**; chips show Canadian retailers | [x] |
 | 2.7 | **Fresh finds** | H2; **tabs:** This week, All price drops, Open box, In stock by city; list items with was/now, %; **brand count grid** below | Tab switches list (client or route) | — | `home-tab-*-desktop-1440.png` | Same tabs; cities Canadian | [x] |
 | 2.8 | **Alerts CTA** | H2 “Get pinged…”; copy; button → signup | Links `/auth/signup` (real site) | — | home | Our `/alerts/` stub (no signup gate) | [x] |
 | 2.9 | **FAQ** | H2 “Questions buyers ask”; **accordion groups** (disclosure); chevron rotates | Click expands one answer | — | `home-faq-expanded-desktop-1440.png` | Canadian copy (MSRP CAD, stores, km) | [x] |
@@ -66,7 +66,7 @@
 | # | Content | Notes | Screenshot | Canada | Impl |
 |---|---------|-------|------------|--------|------|
 | 3.1 | List/grid of all GPU families | Links to `/gpus/{slug}` | `gpus-index-desktop-1440.png` | Include 40-series, RTX PRO | [x] |
-| 3.2 | Series hub | e.g. `/gpus/series/geforce-50` | `series-50-desktop-1440.png` | GeForce 50 + 40 series pages | [~] |
+| 3.2 | Series hub | e.g. `/gpus/series/geforce-50` | `series-50-desktop-1440.png` | GeForce 50 + 40 series pages | [x] |
 
 ---
 
@@ -77,9 +77,9 @@
 | 4.1 | **Header** | Series · arch; H1 “{GPU} price & stock”; chip specs (VRAM, bus, CUDA, boost, TDP, launch date) | — | — | `gpu-5070-desktop-1440.png` | CAD MSRP block | [x] |
 | 4.2 | **Summary stats** | MSRP, Lowest, In stock fraction, Store count | — | — | same | CAD | [x] |
 | 4.3 | **Product line chips** | Sub-variant links (?line=zotac-solid) with count + price | Filters card list on page | `?line=` | same | Placeholder lines | [~] |
-| 4.4 | **Filters sidebar** | Form “Filters”: Sold at, Brand, Product line, Form factor, Length/Height/Slots comboboxes, Fans, PSU, HDMI, Color, RGB, Refurbished, Warranty; collapsible sections | Multi-select chips; **Sort** combobox | Many `?` params | same | Retailers = CA; km radius if location set | [~] |
+| 4.4 | **Filters sidebar** | Form “Filters”: Sold at, Brand, Product line, Form factor, Length/Height/Slots comboboxes, Fans, PSU, HDMI, Color, RGB, Refurbished, Warranty; collapsible sections | Multi-select chips; **Sort** combobox | Many `?` params | same | Retailers = CA; km radius if location set | [~] brand + in-stock only |
 | 4.5 | **Card table** | Columns: Card (image+name), VRAM, Length, Price (sortable), Stock, Sparkline/history, Compare checkbox | Header clicks set `?sort=` | `?sort=name|mem|len|-price|…` | same | **% vs MSRP**, **$/GB** sort (improvement) | [x] |
-| 4.6 | **Availability map / store list** | (if present below fold) | — | — | scroll in screenshot | Canadian cities | [~] |
+| 4.6 | **Availability map / store list** | (if present below fold) | — | — | scroll in screenshot | Canadian cities | [x] sample shelf list |
 
 ---
 
@@ -106,7 +106,7 @@
 | 6.2 | Filter panel | Same family as GPU page filters + **Availability** | `?avail=stock` etc. | `cards-in-stock-desktop-1440.png` | — | [~] |
 | 6.3 | Sort combobox | Most popular, Newest, Lowest/Highest price, Closest to MSRP, Most stores in stock, Top rated, Shortest, Most memory, Highest boost, Name | `?sort=` | cards-all | Add **Best $/GB VRAM** | [x] |
 | 6.4 | Results table | Thumbnail, name, specs, price, stock badge, **inline sparkline** | Row → card page | — | CAD | [x] |
-| 6.5 | Empty state | No cards match filters | — | (derive) | Copy + clear filters CTA | [~] |
+| 6.5 | Empty state | No cards match filters | — | (derive) | Copy + clear filters CTA | [x] |
 
 ---
 
@@ -195,7 +195,7 @@ Horizontal bar showing lowest in-stock price as fraction of launch MSRP (scale ~
 
 Small inline SVG ~120×28px showing 7–30 day price trend per offer/card; links to full chart on card page.
 
-**Impl:** [~]
+**Impl:** [x]
 
 ---
 
@@ -270,12 +270,12 @@ Default dark; toggle switches to light palette (observed inverted backgrounds). 
 ## 22. Implementation manifest (Phase 2)
 
 ```
-Global chrome .............. 1.1–1.6 [x] (1.4 mobile [~])
-Home ....................... 2.1–2.9 [x] (2.6 postal row [~])
-GPUs index/series .......... 3.1 [x] 3.2 [~]
-GPU detail ................. 4.1–4.5 [x]; 4.3–4.4 filters [~]; 4.6 map [~]
+Global chrome .............. 1.1–1.6 [x]
+Home ....................... 2.1–2.9 [x]
+GPUs index/series .......... 3.1–3.2 [x]
+GPU detail ................. 4.1–4.5, 4.6 [x]; 4.3–4.4 filters [~] partial
 Card detail ................ 5.1–5.5, 5.7 [x]; 5.6, 5.8 [~]
-All cards .................. 6.1, 6.3–6.4 [x]; 6.2, 6.5 [~]
+All cards .................. 6.1, 6.3–6.5 [x]; 6.2 filter panel [~]
 Deals routes ............... §7 [x] finder/compare [~]
 Stores ..................... §8 [x]
 Brands ..................... §9 [x]
@@ -283,7 +283,7 @@ Preferences ................ §10 [x] pinned stores / retailer prefs [~]
 Alerts stub ................ §11 [~]
 Search ..................... §12 [x]
 Components ................. §13–§17 (see checkmarks above)
-Errors ..................... §18 [x]/[~]
+Errors ..................... §18 [x] empty filters [x]
 ```
 
 **Phase 2 summary:** [`rtx-live-spec-impl-status.md`](./rtx-live-spec-impl-status.md) · Side-by-side: `docs/compare/`
