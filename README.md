@@ -4,6 +4,8 @@ Canada-first NVIDIA GPU price tracker (feature parity target: [rtx.live](https:/
 
 **Placeholder data only** until retailer sources pass ToS / robots review. No scraping or live fetches in this repo.
 
+**UX spec:** [`docs/rtx-live-spec.md`](docs/rtx-live-spec.md) — internal reference screenshots in [`docs/reference/rtx-live/`](docs/reference/rtx-live/) (not shipped to users).
+
 ## Quick start
 
 ```bash
