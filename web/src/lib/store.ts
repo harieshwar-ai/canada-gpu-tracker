@@ -147,9 +147,11 @@ export function getLiveActivity(limit = 8): LiveActivityItem[] {
 
   if (items.length < limit) {
     const latest = latestByOffer();
-    const seen = new Set<string>();
+    const seenOffers = new Set<string>();
+    const seenCards = new Set<string>();
     for (const o of store.offers) {
-      if (!isLiveOffer(o) || seen.has(o.id)) continue;
+      if (!isLiveOffer(o) || seenOffers.has(o.id) || seenCards.has(o.cardId))
+        continue;
       const obs = latest.get(o.id);
       if (!obs) continue;
       const card = cardMap.get(o.cardId);
@@ -159,7 +161,8 @@ export function getLiveActivity(limit = 8): LiveActivityItem[] {
         .filter((p) => p.offerId === o.id)
         .sort((a, b) => a.observedAt.localeCompare(b.observedAt))[0];
       if (!first) continue;
-      seen.add(o.id);
+      seenOffers.add(o.id);
+      seenCards.add(o.cardId);
       items.push({
         kind: "first_seen",
         title: `${card.brand} ${card.modelName}`,

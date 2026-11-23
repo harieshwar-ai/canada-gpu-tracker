@@ -28,8 +28,41 @@ test("Canada Computers parser reads JSON-LD product", async () => {
   assert.equal(parsed!.brand, "MSI");
   assert.equal(parsed!.sku, "VCMSI00514");
   assert.equal(parsed!.priceCad, 1989.99);
-  assert.ok(parsed!.inStockOnline, "in stock when any store has quantity");
+  assert.equal(
+    parsed!.inStockOnline,
+    false,
+    "online stock follows delivery text, not store counts"
+  );
   assert.ok((parsed!.storeStock?.filter((s) => s.quantity > 0).length ?? 0) >= 12);
+});
+
+test("Canada Computers parser: sold out online but in-store stock", async () => {
+  const html = await loadFixture(
+    "canada-computers",
+    "msi-rtx-5070ti-ventus.html"
+  );
+  const parsed = parseCanadaComputersProduct(html, "https://example.test/cc");
+  assert.ok(parsed);
+  assert.equal(parsed!.inStockOnline, false);
+  const burnaby = parsed!.storeStock?.find((s) => s.storeKey === "cc-burnaby");
+  assert.ok(burnaby && burnaby.quantity >= 0, "store rows remain independent");
+  assert.ok(
+    parsed!.storeStock!.some((s) => s.quantity > 0),
+    "in-store availability still parsed"
+  );
+});
+
+test("Canada Computers parser: in stock online when delivery says so", () => {
+  const html = `
+    <script type="application/ld+json">{"@type":"Product","name":"ZOTAC RTX 5060","brand":{"name":"ZOTAC"},"sku":"VCZOT00281OB","offers":{"price":636.49,"availability":"https://schema.org/InStock"}}</script>
+    <h1 class="product-title">ZOTAC GAMING GeForce RTX 5060 AMP 8GB GDDR7(Open Box)</h1>
+    <p id="delivery-text" class="mt-1">In stock online</p>
+    <span class="col-3">Burnaby</span><span class="shop-online-box">1</span>
+  `;
+  const parsed = parseCanadaComputersProduct(html, "https://example.test/cc/5060");
+  assert.ok(parsed);
+  assert.equal(parsed!.inStockOnline, true);
+  assert.equal(parsed!.storeStock?.find((s) => s.storeKey === "cc-burnaby")?.quantity, 1);
 });
 
 test("Canada Computers parser maps Edmonton store labels", async () => {
