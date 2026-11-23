@@ -1,48 +1,139 @@
 ---
-import { getLiveChanges, getCardMap, getGpuMap } from "../lib/store";
+import { getStore, getLiveChanges, getCardMap, getRetailerMap } from "../lib/store";
+import type { Offer } from "../../../types/db";
 import { formatCad } from "../lib/format";
 import { timeAgo } from "../lib/time";
 
-const events = getLiveChanges(8);
-const cardMap = getCardMap();
-const gpuMap = getGpuMap();
+function isLiveOffer(o: Offer): boolean {
+  return o.isPlaceholder !== true;
+}
+
+interface ActivityItem {
+  title: string;
+  detail: string;
+  href: string;
+  occurredAt: string;
+}
+
+function buildLiveActivity(limit: number): ActivityItem[] {
+  const store = getStore();
+  const cardMap = getCardMap();
+  const retailerMap = getRetailerMap();
+  const items: ActivityItem[] = [];
+
+  for (const ev of getLiveChanges(limit * 2)) {
+    const card = cardMap.get(ev.cardId);
+    if (!card) continue;
+    if (ev.offerId) {
+      const offer = store.offers.find((o) => o.id === ev.offerId);
+      if (offer && !isLiveOffer(offer)) continue;
+    }
+    let detail = "";
+    if (ev.eventType === "price_drop" && ev.priceCad != null) {
+      detail = `Price drop · ${formatCad(ev.priceCad)}`;
+    } else if (ev.eventType === "in_stock") {
+      detail = "Back in stock";
+    } else {
+      detail = "Sold out";
+    }
+    items.push({
+      title: `${card.brand} ${card.modelName}`,
+      detail,
+      href: `/cards/${card.slug}/`,
+      occurredAt: ev.occurredAt,
+    });
+  }
+
+  const latest = new Map<string, import("../../../types/db").PriceObservation>();
+  for (const obs of store.priceObservations) {
+    const prev = latest.get(obs.offerId);
+    if (!prev || obs.observedAt > prev.observedAt) latest.set(obs.offerId, obs);
+  }
+
+  const seen = new Set(
+    items.map((i) => i.href)
+  );
+  for (const o of store.offers) {
+    if (!isLiveOffer(o)) continue;
+    const card = cardMap.get(o.cardId);
+    const retailer = retailerMap.get(o.retailerId);
+    if (!card || !retailer) continue;
+    const href = `/cards/${card.slug}/`;
+    if (seen.has(href)) continue;
+    const first = [...store.priceObservations]
+      .filter((p) => p.offerId === o.id)
+      .sort((a, b) => a.observedAt.localeCompare(b.observedAt))[0];
+    if (!first) continue;
+    seen.add(href);
+    items.push({
+      title: `${card.brand} ${card.modelName}`,
+      detail: `First seen · ${formatCad(first.priceCad)} · ${retailer.name}`,
+      href,
+      occurredAt: first.observedAt,
+    });
+  }
+
+  return items
+    .sort((a, b) => b.occurredAt.localeCompare(a.occurredAt))
+    .slice(0, limit);
+}
+
+const events = buildLiveActivity(8);
 ---
 
-<section class="panel">
+<section class="panel live-changes">
   <div class="panel-head">
     <h2>Live changes</h2>
   </div>
-  <ul class="change-list">
-    {events.map((ev) => {
-      const card = cardMap.get(ev.cardId);
-      const gpu = card ? gpuMap.get(card.gpuId) : undefined;
-      let detail = "";
-      if (ev.eventType === "price_drop" && ev.priceCad != null && ev.previousPriceCad != null) {
-        const delta = ev.previousPriceCad - ev.priceCad;
-        detail = `−${formatCad(delta)}`;
-      } else if (ev.eventType === "in_stock") {
-        detail = "In stock";
-      } else {
-        detail = "Sold out";
-      }
-      const place = ev.city ? ` · ${ev.city}` : "";
-      return (
+  {events.length === 0 ? (
+    <p class="muted small live-empty">No live ingested prices yet. Real retailer rows will show here after the next successful crawl.</p>
+  ) : (
+    <ul class="change-list">
+      {events.map((ev) => (
         <li class="change-item">
-          <a href={card ? `/cards/${card.slug}/` : "#"}>
-            <span class={`change-icon ${ev.eventType === "price_drop" ? "drop" : ev.eventType === "in_stock" ? "stock" : "out"}`}>
-              {ev.eventType === "price_drop" ? "↓" : ev.eventType === "in_stock" ? "✓" : "×"}
-            </span>
-            <span>
-              <span class="change-title">{gpu?.modelName.replace("GeForce ", "")} {card?.brand} {card?.modelName}</span>
-              <span class="change-meta">
-                {detail}
-                {place} · {timeAgo(ev.occurredAt)}
-              </span>
-            </span>
-            {ev.priceCad != null && <span class="change-price">{formatCad(ev.priceCad)}</span>}
+          <a href={ev.href} class="change-link">
+            <span class="change-title">{ev.title}</span>
+            <span class="change-meta muted small">{ev.detail}</span>
           </a>
+          <span class="muted small">{timeAgo(ev.occurredAt)}</span>
         </li>
-      );
-    })}
-  </ul>
+      ))}
+    </ul>
+  )}
 </section>
+
+<style>
+  .change-list {
+    list-style: none;
+    margin: 0.35rem 0 0;
+    padding: 0;
+    display: grid;
+    gap: 0.65rem;
+  }
+  .change-item {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 0.35rem;
+    align-items: baseline;
+  }
+  .change-link {
+    display: flex;
+    flex-direction: column;
+    gap: 0.12rem;
+    color: var(--text);
+    text-decoration: none;
+    min-width: 0;
+    flex: 1;
+  }
+  .change-link:hover .change-title {
+    color: var(--accent);
+  }
+  .change-title {
+    font-weight: 600;
+    overflow-wrap: anywhere;
+  }
+  .live-empty {
+    margin: 0.5rem 0 0.15rem;
+  }
+</style>

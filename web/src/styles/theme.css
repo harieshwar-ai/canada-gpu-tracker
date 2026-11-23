@@ -39,6 +39,8 @@ body {
   font-family: var(--font);
   font-size: 15px;
   line-height: 1.45;
+  overflow-x: clip;
+  max-width: 100%;
 }
 
 a {
@@ -207,15 +209,15 @@ main.page-wrap {
   padding-bottom: 3rem;
 }
 
-.banner-placeholder {
-  max-width: var(--page-max);
-  margin: 0 auto 0.75rem;
-  padding: 0.55rem 0.85rem;
-  border: 1px solid #6b5a12;
-  background: #1a1808;
-  color: #f0e2a8;
-  border-radius: var(--radius-sm);
-  font-size: 0.82rem;
+.page-wrap {
+  min-width: 0;
+  width: 100%;
+}
+
+.table-wrap {
+  max-width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .hero-split {

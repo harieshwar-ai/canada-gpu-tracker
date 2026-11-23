@@ -1,33 +1,50 @@
-/** Mirrors db/migrations/001_init.sql + 002_extended.sql */
+/** Shared types for Supabase rows and the static JSON store (v2). */
 
-export type GpuSeries = "50-series" | "40-series" | "30-series" | "other";
-export type ProductLine = "geforce" | "rtx_pro" | "other";
-export type OfferCondition = "new" | "open_box" | "refurb";
-export type ChangeEventType = "price_drop" | "in_stock" | "sold_out";
+export type ProductLine = "geforce" | "rtx_pro";
+
+export type Series =
+  | "50-series"
+  | "40-series"
+  | "30-series"
+  | "pro-5000"
+  | "pro-4000";
+
+export type Cooling = "blower" | "dual" | "triple" | "quad";
+
+export type OfferCondition = "new" | "open_box";
+
+export type ChangeEventType = "price_drop" | "in_stock" | "out_of_stock";
+
 export type AlertScope = "card" | "gpu" | "product_line";
 
 export interface Gpu {
   id: string;
   slug: string;
   modelName: string;
-  series: GpuSeries;
   productLine: ProductLine;
-  chip: string;
+  series: Series;
   vramGb: number;
-  msrpCad: number;
   launchMsrpCad: number;
-  createdAt: string;
-  updatedAt: string;
+}
+
+export interface Card {
+  id: string;
+  slug: string;
+  gpuId: string;
+  brand: string;
+  modelName: string;
+  vramGb: number;
+  lengthMm: number | null;
+  slotWidth: number | null;
+  cooling: Cooling | null;
+  powerConnector: string | null;
+  psuWatts: number | null;
 }
 
 export interface Retailer {
   id: string;
   slug: string;
   name: string;
-  websiteUrl: string;
-  countryCode: string;
-  hasPhysicalStores: boolean;
-  createdAt: string;
 }
 
 export interface Store {
@@ -37,26 +54,8 @@ export interface Store {
   name: string;
   city: string;
   provinceCode: string;
-  countryCode: string;
   latitude: number | null;
   longitude: number | null;
-  createdAt: string;
-}
-
-export interface Card {
-  id: string;
-  gpuId: string;
-  slug: string;
-  brand: string;
-  modelName: string;
-  vramGb: number;
-  lengthMm: number | null;
-  slotWidth: number | null;
-  cooling: string | null;
-  psuWatts: number | null;
-  powerConnector: string | null;
-  createdAt: string;
-  updatedAt: string;
 }
 
 /** Retailer or store shelf / online SKU offer (listings table). */
@@ -145,5 +144,4 @@ export interface TrackerStore {
   priceObservations: PriceObservation[];
   changeEvents: ChangeEvent[];
   provinceTaxes: ProvinceTax[];
-  ingestLogs?: IngestRunLogEntry[];
 }

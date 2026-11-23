@@ -8,6 +8,10 @@ import {
   getPriceHistoryForCard,
 } from "./store";
 
+function isLiveOffer(o: Offer): boolean {
+  return o.isPlaceholder !== true;
+}
+
 function latestByOffer() {
   const latest = new Map<string, import("../../../types/db").PriceObservation>();
   for (const obs of getStore().priceObservations) {
@@ -36,9 +40,10 @@ export function buildCardRows(): CardRow[] {
   return store.cards.map((card) => {
     const gpu = gpuMap.get(card.gpuId)!;
     const offers = store.offers.filter((o) => o.cardId === card.id);
+    const liveOffers = offers.filter(isLiveOffer);
     let lowest: number | null = null;
     let inStock = false;
-    for (const o of offers) {
+    for (const o of liveOffers) {
       const obs = latest.get(o.id);
       if (!obs?.inStock) continue;
       inStock = true;
@@ -61,7 +66,7 @@ export function buildCardRows(): CardRow[] {
       pctMsrp: pct,
       pricePerGb,
       sparkline: hist.length ? hist : lowest != null ? [lowest] : [],
-      offerCount: offers.length,
+      offerCount: liveOffers.length,
     };
   });
 }

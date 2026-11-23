@@ -18,8 +18,8 @@ const cards = getAllCards();
 ---
 
 <Layout title={`${store.name} — Canada GPU Tracker`} description={`Shelf stock at ${store.name} (placeholder).`}>
-  <PlaceholderBanner />
   <main id="main" class="page-wrap">
+    <PlaceholderBanner />
     <h1>{store.name}</h1>
     <p class="muted">{retailer.name} · {store.city}, {store.provinceCode}</p>
     <table class="data-table panel">
