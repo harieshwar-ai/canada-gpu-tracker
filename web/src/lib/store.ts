@@ -109,7 +109,10 @@ export function getLaunchPriceGrid(): GpuLaunchRow[] {
     const gpuCards = store.cards.filter((c) => c.gpuId === gpu.id);
     const gpuOffers = store.offers.filter((o) => o.gpuId === gpu.id);
     const inStockOffers = gpuOffers.filter(
-      (o) => latest.get(o.id)?.inStock && o.condition === "new"
+      (o) =>
+        !o.isPlaceholder &&
+        latest.get(o.id)?.inStock &&
+        o.condition === "new"
     );
     let cheapest: number | null = null;
     const storeIds = new Set<string>();
@@ -160,7 +163,7 @@ export function getCheapestPerGpu(): CheapestGpuRow[] {
 
   return getGeForce50Gpus().map((gpu) => {
     const offers = store.offers.filter(
-      (o) => o.gpuId === gpu.id && o.condition === "new"
+      (o) => o.gpuId === gpu.id && o.condition === "new" && !o.isPlaceholder
     );
     let best: { card: Card; price: number; retailer: Retailer } | null = null;
     const chips: RetailerChip[] = [];
